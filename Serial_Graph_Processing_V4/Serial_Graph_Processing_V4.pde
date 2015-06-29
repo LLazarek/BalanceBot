@@ -49,8 +49,8 @@ void setup () {
    2. Updates local tunings if the string contains relevant info
 */
 public void input(String theText) {
-  myPort.write(str);
-  updateK(str);
+  myPort.write(theText);
+  updateK(theText);
 }
 
 /* draw:
@@ -191,7 +191,7 @@ void resetGraph(){
 void updateLn1(String val){
   val = trim(val);
   float readVal = float(val);
-  //readVal = map(readVal, -5, 5, 0, height);
+  readVal = map(readVal, -5, 5, 0, height);// Map from value scale to screen size
 
   stroke(0,0,255); // Blue line
   strokeWeight(2);
@@ -215,7 +215,7 @@ void updateLn1(String val){
 void updateLn2(String val){
   val = trim(val);
   float readVal = float(val);
-  //readVal = map(readVal, -255, 255, 0, height);
+  readVal = map(readVal, -255, 255, 0, height);// Map from value scale to screen size
 
   stroke(255,0,0);     // Red line
   strokeWeight(2);
