@@ -68,6 +68,17 @@
 /*************************************************************************/
 /* Serial reading functions */
 
+/* checkSerialMon:
+   Checks if there is data in the Serial buffer
+
+   @return
+   0        if no data available
+   # > 0    if data available
+*/
+int checkSerialMon(void){
+  return Serial.available();
+}
+
 /* Serial_RmWhiteSpc:
    Removes white space from the Serial buffer
 */

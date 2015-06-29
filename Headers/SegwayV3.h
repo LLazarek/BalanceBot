@@ -9,7 +9,7 @@
 #define sampleNum 20 // Number of samples for bias calculation
 #define LEDpin 2
 #define switchPin 7
-#define histLen 4 // Number of entries to use in rolling average
+#define histLen 9 // Number of entries to use in rolling average
 
 Adafruit_MotorShield AFMS = Adafruit_MotorShield();
 Adafruit_DCMotor *motor_1 = AFMS.getMotor(1);
@@ -23,7 +23,7 @@ double gyro_bias = 0;
 double filtered_angle = 0;
 int fallen = 0;// Flag for fall detection
 
-double hist[histLen];// History for smoothing PID output
+double hist[histLen];// History for rolling average of PID output
 
 // PID
 double setpoint, input, output;
@@ -42,17 +42,6 @@ void PID_init(){
   myPID.SetMode(AUTOMATIC);
   myPID.SetSampleTime(10); // 10 ms loop
   myPID.SetOutputLimits(-255,255);
-}
-
-/* PID_calibrate
-   Recalibrates the PID based on the current angle position
-   
-   @params
-   angle:       The current filtered angle position
-*/
-double PID_calibrate(double angle){
-  angle = abs(angle);
-  return 1;
 }
 
 /* PID_Hist:
@@ -183,17 +172,6 @@ void motorControl(int spd){
   
   motor_1 -> setSpeed(spd = abs(spd));
   motor_2 -> setSpeed(spd);
-}
-
-/* checkSerialMon:
-   Checks if there is data in the Serial buffer
-
-   @return
-   0        if no data available
-   # > 0    if data available
-*/
-int checkSerialMon(void){
-  return Serial.available();
 }
 
 /* updateTunings:
