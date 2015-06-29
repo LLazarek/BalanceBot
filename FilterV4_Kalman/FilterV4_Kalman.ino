@@ -1,7 +1,8 @@
 /* Changelog: FilterV4_Kalman
 
 * Implemented Kalman Filter instead of Complementary
-  See: gyro_readVelocity(), kalmanCalculate()
+  See: -gyro_readDAngle(), -filter(),
+       +gyro_readRate(), +kalmanCalculate()
 
 */
 
