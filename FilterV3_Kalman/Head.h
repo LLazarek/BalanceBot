@@ -1,4 +1,4 @@
-#include <std.h>
+#include "mystd.h"
 
 #define accel_y_pin A0
 #define accel_sensitivity 0.282519395 // Accelerometer sensitivity

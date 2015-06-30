@@ -1,3 +1,5 @@
+#include <Arduino.h>
+
 /* Printing definitions, intended to make printing combinations of strings
    and values to the Serial moniter less painful and more concise. */
 
