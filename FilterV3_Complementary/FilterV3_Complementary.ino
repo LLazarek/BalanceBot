@@ -10,7 +10,6 @@
 #include <PID_v1.h>
 #include <Adafruit_MotorShield.h>
 #include "Head.h"
-//#include <SegwayV3.h>// Contains all functions, global vars, etc
 
 /********************** SETUP **********************/
 void setup(){
@@ -63,6 +62,7 @@ void loop(){
       prevSwState = 1;
       motorControl(0);
       println("Robot is now off. Flip the switch to turn on.");
+      print3("kp = ", kp, ", ki = ", ki, ", kd = ", kd, "\n");
     }
     delay(500);
   }
