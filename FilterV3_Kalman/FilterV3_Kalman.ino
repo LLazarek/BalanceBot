@@ -3,6 +3,7 @@
 * Implemented Kalman Filter instead of Complementary
   See: -gyro_readDAngle(), -filter(),
        +gyro_readRate(), +kalmanCalculate()
+* Updated code to be Arduino Due compatible
 
 */
 

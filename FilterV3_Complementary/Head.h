@@ -28,7 +28,7 @@ double hist[histLen];// History for rolling average of PID output
 // PID
 double setpoint, input, output;
 double kp = 150, ki = 2000, kd = 8;
-// Successful tuning values: 150, 2000, 8
+// Successful tuning values: topwgt: 150, 2000, 8 ||| nowgt: 55, 2000, 9
 PID myPID(&input, &output, &setpoint, kp, ki, kd, DIRECT);
 
 /************************** Begin Functions ************************/

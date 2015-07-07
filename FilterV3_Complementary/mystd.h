@@ -147,8 +147,6 @@ float Serial_ReadFloat(void){
 /* software_Reset:
    Restarts the arduino sketch
 */
-void software_Reset(){
-  asm volatile ("  jmp 0");  
-}
+void (* software_Reset) (void) = 0;
 
 /*************************************************************************/
