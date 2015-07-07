@@ -2,6 +2,7 @@
 
 * Added serial communication to dynamically update pid variables from user input
   See: +checkSerialMon(), +updateTunings()
+* Updated code to be Arduino Due compatible
 
 */
 
