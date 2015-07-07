@@ -24,11 +24,11 @@ void setup(){
   print3("K vals: kp = ", kp, ", ki = ", ki, ", kd = ", kd, "\n");
   delay(2000);// Allow time for user to flip switch and edit tunings
   
-  while(digitalRead(switchPin)){// Wait for switch to be flipped on
-    if(checkSerialMon()) updateTunings();// Handle serial input, if any
+  /* while(digitalRead(switchPin)){// Wait for switch to be flipped on */
+  /*   if(checkSerialMon()) updateTunings();// Handle serial input, if any */
     
-    delay(250);
-  }
+  /*   delay(250); */
+  /* } */
   
   // Initialize Gyro
   while(!gyro.init());
@@ -57,25 +57,26 @@ void loop(){
   
   /* Switch handling: Stops running if the switch is flipped off, then restarts sketch
      when flipped back on */
-  while(digitalRead(switchPin)){// Loop while switch is off
-    if(prevSwState == 0){
-      digitalWrite(LEDpin, LOW);
-      prevSwState = 1;
-      motorControl(0);
-      println("Robot is now off. Flip the switch to turn on.");
-      print3("kp = ", kp, ", ki = ", ki, ", kd = ", kd, "\n");
-    }
-    delay(500);
-  }
-  if(prevSwState == 1){// Switch turned back on
-    software_Reset();// See std.h
-  }
+  /* while(digitalRead(switchPin)){// Loop while switch is off */
+  /*   if(prevSwState == 0){ */
+  /*     digitalWrite(LEDpin, LOW); */
+  /*     prevSwState = 1; */
+  /*     motorControl(0); */
+  /*     println("Robot is now off. Flip the switch to turn on."); */
+  /*     print3("kp = ", kp, ", ki = ", ki, ", kd = ", kd, "\n"); */
+  /*   } */
+  /*   delay(500); */
+  /* } */
+  /* if(prevSwState == 1){// Switch turned back on */
+  /*   software_Reset();// See std.h */
+  /* } */
   
   
   if(checkSerialMon()) updateTunings();
   
   gyro_d_angle = gyro_readDAngle();
   accel_angle = accel_readAngle();
+  print2("dAngle: ", gyro_d_angle, "\taccelAngle: ", accel_angle, "\n");
   
   input = filter(gyro_d_angle, accel_angle);// Filter angle reading
   print(input);

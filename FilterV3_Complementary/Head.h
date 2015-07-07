@@ -167,11 +167,7 @@ double filter(double d_angle, double accel_angle){
    1 - 255      = Forward
 */
 void motorControl(int spd){
-  motor_1 -> run(spd > 0 ? BACKWARD : FORWARD);
-  motor_2 -> run(spd > 0 ? BACKWARD : FORWARD);
-  
-  motor_1 -> setSpeed(spd = abs(spd));
-  motor_2 -> setSpeed(spd);
+  analogWrite(DAC0, spd);// Send speed to RoboteQ motor controller
 }
 
 /* updateTunings:
