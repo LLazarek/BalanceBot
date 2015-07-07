@@ -2,7 +2,7 @@
 
 * Implemented Kalman Filter instead of Complementary
   See: -gyro_readDAngle(), -filter(),
-       +gyro_readRate(), +kalmanCalculate()
+       +gyro_readRate(), +kalman()
 * Updated code to be Arduino Due compatible
 
 */
@@ -11,8 +11,7 @@
 #include <L3G.h>
 #include <PID_v1.h>
 #include <Adafruit_MotorShield.h>
-#include "Head.h"
-//#include <SegwayV4.h>// Contains all functions, global vars, etc
+#include "Head.h"// Contains all functions, global vars, etc
 
 /********************** SETUP **********************/
 void setup(){
@@ -78,7 +77,7 @@ void loop(){
   gyro_rate = gyro_readRate();
   accel_angle = accel_readAngle();
   
-  input = kalmanCalculate(accel_angle, gyro_rate, loop_time);// Filter angle reading
+  input = kalman(accel_angle, gyro_rate);// Filter angle reading
   print(input);
   myPID.Compute();
   output = PID_Hist(output);// Smooth PID output

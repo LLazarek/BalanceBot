@@ -32,12 +32,12 @@ double kp = 55, ki = 2000, kd = 9;
 PID myPID(&input, &output, &setpoint, kp, ki, kd, DIRECT);
 
 /************************** Kalman Filter Vars *********************/
- float Q_angle  =  0.001;
- float Q_gyro   =  0.003;
- float R_angle  =  0.03;
- float x_angle = 0;
- float x_bias = 0;
- float P_00 = 0, P_01 = 0, P_10 = 0, P_11 = 0;
+float Q_angle2 = 0.001;
+float Q_gyroBias = 0.003;
+float R_measure = 0.03;
+float angle = 0, rate = 0;
+float rate_bias = 0;
+float P[2][2];
 
 /************************** Begin Functions ************************/
 
@@ -149,43 +149,48 @@ double accel_readAngle(){
 }
 
 
-/* kalmanCalculate:
+/* kalman:
    Applys Kalman filter to produce filtered angle estimate from accel
    and gyro data
 
    @params
    newAngle      The angle read by the accelerometer
    newRate       The angular velocity read by the gyroscope
-   looptime      The time, in ms, of delay between readings (see loop_time)
 
    @return
    The filtered angle estimate
 
-   Credits: Code (with slight modification) by Arduino Forum user "kas",
-   obtained at (comment #21):
-   http://forum.arduino.cc/index.php?topic=8871.15
+   Credits: Code (with slight modification) obtained from TKJ Electronics blog
+   http://blog.tkjelectronics.dk/2012/09/a-practical-approach-to-kalman-filter-and-how-to-implement-it/
 */
-float kalmanCalculate(float newAngle, float newRate,int looptime) {
-  float dt = float(looptime)/1000;                                  
-  x_angle += dt * (newRate - x_bias);
-  P_00 +=  - dt * (P_10 + P_01) + Q_angle * dt;
-  P_01 +=  - dt * P_11;
-  P_10 +=  - dt * P_11;
-  P_11 +=  + Q_gyro * dt;
-   
-  float y = newAngle - x_angle;
-  float S = P_00 + R_angle;
-  float K_0 = P_00 / S;
-  float K_1 = P_10 / S;
-   
-  x_angle +=  K_0 * y;
-  x_bias  +=  K_1 * y;
-  P_00 -= K_0 * P_00;
-  P_01 -= K_0 * P_01;
-  P_10 -= K_1 * P_00;
-  P_11 -= K_1 * P_01;
-   
-  return x_angle;
+float kalman(float newAngle, float newRate){
+  float K[2];
+  float dt = float(loop_time)/1000;
+  
+  angle += dt * (newRate - rate_bias);
+  
+  P[0][0] += dt * (dt*P[1][1] - P[0][1] - P[1][0] + Q_angle2);
+  P[0][1] -= dt * P[1][1];
+  P[1][0] -= dt * P[1][1];
+  P[1][1] += Q_gyroBias * dt;
+  
+  float y = newAngle - angle;
+  float S = P[0][0] + R_measure;
+  
+  K[0] = P[0][0] / S;
+  K[1] = P[1][0] / S;
+  
+  angle += K[0] * y;
+  rate_bias += K[1] * y;
+  
+  float P00_temp = P[0][0];
+  float P01_temp = P[0][1];
+  P[0][0] -= K[0] * P00_temp;
+  P[0][1] -= K[0] * P01_temp;
+  P[1][0] -= K[1] * P00_temp;
+  P[1][1] -= K[1] * P01_temp;
+  
+  return angle;
 }
 
 /* motorControl:

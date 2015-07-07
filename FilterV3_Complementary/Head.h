@@ -152,7 +152,7 @@ double accel_readAngle(){
    The filtered angle output
 */
 double filter(double d_angle, double accel_angle){
-  filtered_angle = (d_angle + filtered_angle)*0.98 + accel_angle*0.02;
+  filtered_angle = (d_angle + filtered_angle)*0.97 + accel_angle*0.03;
   return filtered_angle;
 }
 

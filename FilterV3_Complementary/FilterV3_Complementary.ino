@@ -10,7 +10,7 @@
 #include <L3G.h>
 #include <PID_v1.h>
 #include <Adafruit_MotorShield.h>
-#include "Head.h"
+#include "Head.h"// Contains all functions, global vars, etc
 
 /********************** SETUP **********************/
 void setup(){
