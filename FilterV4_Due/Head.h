@@ -3,7 +3,7 @@
 #define accel_y_pin A0
 #define accel_sensitivity 0.282519395 // Accelerometer sensitivity
 // 0.00488758553274682/0.0173
-#define gyro_conversion_DPS 0.00875 // Conversion to angular velocity
+#define gyro_conversion_DPS 8.75/1000 // Conversion to angular velocity
 // 8.75/1000
 #define loop_time 10 // in ms
 #define sampleNum 20 // Number of samples for bias calculation
@@ -14,6 +14,8 @@
 Adafruit_MotorShield AFMS = Adafruit_MotorShield();
 Adafruit_DCMotor *motor_1 = AFMS.getMotor(1);
 Adafruit_DCMotor *motor_2 = AFMS.getMotor(2);
+
+float ang = 0;
 
 L3G gyro;
 
@@ -110,19 +112,19 @@ void biasInit(){
 }
 
 
-/* gyro_readDAngle:
-   Reads gyro angular velocity data and integrates into a change in angle
+/* gyro_readRate:
+   Reads gyro angular velocity data
    (See: gyro_bias, gyro_calcBias(), gyro_conversion_DPS)
-   
+
    @return
-   The approximate change in angle (delta angle)
+   The approximate angular rate of change
 */
-double gyro_readDAngle(){
+double gyro_readRate(){
   static double gyro_velocity;
   
   gyro.read();
   gyro_velocity = (gyro.g.y - gyro_bias) * gyro_conversion_DPS;
-  return gyro_velocity * (loop_time)/1000;// The change in angle
+  return gyro_velocity;
 }
 
 /* accel_readAngle:
@@ -136,7 +138,7 @@ double accel_readAngle(){
   static double accel_y;
   
   accel_y = analogRead(accel_y_pin);
-  return (accel_y - accel_bias)*accel_sensitivity*2;
+  return (accel_y - accel_bias)*accel_sensitivity;
   // Accel is reading ~1/2 the actual angle, so mult by 2
 }
 
@@ -151,8 +153,8 @@ double accel_readAngle(){
    @return
    The filtered angle output
 */
-double filter(double d_angle, double accel_angle){
-  filtered_angle = (d_angle + filtered_angle)*0.98 + accel_angle*0.02;
+double filter(double gyro_rate, double accel_angle){
+  filtered_angle = (gyro_rate*loop_time/1000 + filtered_angle)*0.97 + accel_angle*0.03;
   return filtered_angle;
 }
 
@@ -167,7 +169,7 @@ double filter(double d_angle, double accel_angle){
    1 - 255      = Forward
 */
 void motorControl(int spd){
-  analogWrite(DAC0, spd);// Send speed to RoboteQ motor controller
+  //analogWrite(DAC0, spd);// Send speed to RoboteQ motor controller
 }
 
 /* updateTunings:

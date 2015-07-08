@@ -1,8 +1,7 @@
-/* Changelog: FilterV3_Complementary
+/* Changelog: FilterV4_Due
 
-* Added serial communication to dynamically update pid variables from user input
-  See: +checkSerialMon(), +updateTunings()
-* Updated code to be Arduino Due compatible
+* Updated Code to be Due compatible
+* Changed motor control to RoboteQ controller
 
 */
 
@@ -12,20 +11,22 @@
 #include <Adafruit_MotorShield.h>
 #include "Head.h"
 
+double gyro_rate, accel_angle;
+
 /********************** SETUP **********************/
 void setup(){
   pinMode(accel_y_pin, INPUT);
-  pinMode(switchPin, INPUT_PULLUP);// Engage pullup resistor for switch
+  pinMode(switchPin, INPUT_PULLUP);// Engage pullup resistor
   pinMode(LEDpin, OUTPUT);
   
   Serial.begin(115200);
   Wire.begin();
   
   print3("K vals: kp = ", kp, ", ki = ", ki, ", kd = ", kd, "\n");
-  delay(2000);// Allow time for user to flip switch and edit tunings
+  delay(2000);// Allow time for user to flip switch to edit tunings
   
   /* while(digitalRead(switchPin)){// Wait for switch to be flipped on */
-  /*   if(checkSerialMon()) updateTunings();// Handle serial input, if any */
+  /*   if(checkSerialMon()) updateTunings();// Handle serial input */
     
   /*   delay(250); */
   /* } */
@@ -52,11 +53,11 @@ void setup(){
 /*********************** LOOP ************************/
 void loop(){
   static int prevSwState = 0;// Power switch state tracker
-  static double gyro_d_angle, accel_angle;
+  //static double gyro_d_angle, accel_angle;
   static double res = 0;
   
-  /* Switch handling: Stops running if the switch is flipped off, then restarts sketch
-     when flipped back on */
+  /* Switch handling: Stops running if the switch is flipped off,
+     then restarts sketch when flipped back on */
   /* while(digitalRead(switchPin)){// Loop while switch is off */
   /*   if(prevSwState == 0){ */
   /*     digitalWrite(LEDpin, LOW); */
@@ -73,12 +74,10 @@ void loop(){
   
   
   if(checkSerialMon()) updateTunings();
-  
-  gyro_d_angle = gyro_readDAngle();
+  gyro_rate = gyro_readRate();
   accel_angle = accel_readAngle();
-  print2("dAngle: ", gyro_d_angle, "\taccelAngle: ", accel_angle, "\n");
   
-  input = filter(gyro_d_angle, accel_angle);// Filter angle reading
+  input = filter(gyro_rate, accel_angle);// Filter angle reading
   print(input);
   myPID.Compute();
   output = PID_Hist(output);// Smooth PID output
@@ -90,7 +89,7 @@ void loop(){
   }
   
   if(!fallen) motorControl(output);
-  else print1("\t", fallen, "");;
+  else print1("\t", fallen, "");
   
   println();
   delay(loop_time);
