@@ -1,9 +1,9 @@
 #include "mystd.h"
 
 #define accel_y_pin A0
-#define accel_sensitivity 0.282519395 // Accelerometer sensitivity
+#define accel_sensitivity 1/17.28 // Accelerometer sensitivity
 // 0.00488758553274682/0.0173
-#define gyro_conversion_DPS 8.75/1000 // Conversion to angular velocity
+#define gyro_conversion_DPS 8.75/1000 // Conversion angular velocity
 // 8.75/1000
 #define loop_time 10 // in ms
 #define sampleNum 20 // Number of samples for bias calculation
@@ -18,6 +18,7 @@ Adafruit_DCMotor *motor_2 = AFMS.getMotor(2);
 float ang = 0;
 
 L3G gyro;
+LSM303 compass;
 
 // Angle detection variables
 double accel_bias = 0;
@@ -96,7 +97,8 @@ void accel_calcBias(){
   
   for(int n = 0; n < sampleNum; n++)
   {
-    accel_bias += analogRead(accel_y_pin);
+    compass.read();
+    accel_bias += compass.a.z >> 4;// last 4 bits are 0
     delay(50);
   }
   accel_bias = accel_bias/sampleNum;
@@ -136,10 +138,10 @@ double gyro_readRate(){
 */
 double accel_readAngle(){
   static double accel_y;
-  
-  accel_y = analogRead(accel_y_pin);
+
+  compass.read();
+  accel_y = compass.a.z >> 4;
   return (accel_y - accel_bias)*accel_sensitivity;
-  // Accel is reading ~1/2 the actual angle, so mult by 2
 }
 
 

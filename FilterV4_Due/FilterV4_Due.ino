@@ -9,6 +9,7 @@
 #include <L3G.h>
 #include <PID_v1.h>
 #include <Adafruit_MotorShield.h>
+#include <LSM303.h>
 #include "Head.h"
 
 double gyro_rate, accel_angle;
@@ -34,6 +35,9 @@ void setup(){
   // Initialize Gyro
   while(!gyro.init());
   gyro.enableDefault();
+
+  while(!compass.init());
+  compass.enableDefault();
   
   /* Stabilization delay */
   println("Stabilize the robot.");
