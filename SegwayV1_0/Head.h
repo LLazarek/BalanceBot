@@ -11,18 +11,12 @@
 #define switchPin 7
 #define histLen 9 // Number of entries to use in rolling average
 
-Adafruit_MotorShield AFMS = Adafruit_MotorShield();
-Adafruit_DCMotor *motor_1 = AFMS.getMotor(1);
-Adafruit_DCMotor *motor_2 = AFMS.getMotor(2);
-
-float ang = 0;
-
 L3G gyro;
 LSM303 compass;
 
 // Angle detection variables
-double accel_bias = 0;
-double gyro_bias = 0;
+double accel_bias;
+double gyro_bias;
 double filtered_angle = 0;
 int fallen = 0;// Flag for fall detection
 
@@ -31,7 +25,6 @@ double hist[histLen];// History for rolling average of PID output
 // PID
 double setpoint, input, output;
 double kp = 150, ki = 2000, kd = 8;
-// Successful tuning values: 150, 2000, 8
 PID myPID(&input, &output, &setpoint, kp, ki, kd, DIRECT);
 
 /************************** Begin Functions ************************/
@@ -149,8 +142,8 @@ double accel_readAngle(){
    Applys Complementary filter to the sensors to create an estimated angle
 
    @params
-   d_angle:     The current angular rate of change (read by the gyro)
-   accel_angle: The current angle reading (read by the accelerometer)
+   gyro_rate:     The current angular rate of change (read by the gyro)
+   accel_angle:   The current angle reading (read by the accelerometer)
   
    @return
    The filtered angle output
@@ -161,7 +154,8 @@ double filter(double gyro_rate, double accel_angle){
 }
 
 /* motorControl:
-   Controls the motors
+   Sends motor control output from PID calculation to the RoboteQ
+   motor controller
   
    @params
    spd:       The speed for the motors (in range (-255, 255), signed)
@@ -171,7 +165,10 @@ double filter(double gyro_rate, double accel_angle){
    1 - 255      = Forward
 */
 void motorControl(int spd){
-  //analogWrite(DAC0, spd);// Send speed to RoboteQ motor controller
+  // Convert speed value to range required by roboteQ controller
+  spd = map(spd, -255, 255, 0, 1024);
+  analogWrite(DAC0, spd);// Send speed to RoboteQ motor controller
+  analogWrite(DAC1, spd);
 }
 
 /* updateTunings:
@@ -205,5 +202,24 @@ void updateTunings(void){
   }else if(var == '.'){
     print3("K vals: kp = ", kp, ", ki = ", ki, ", kd = ", kd, "\n");
   }
+}
+
+/* reset:
+   Re-initializes all necessary variables etc to restart the
+   balancing algorithm
+*/
+void reset(void){
+  filtered_angle = 0;
+  for(int i = 0; i < histLen; i++) hist[i] = 0;
+  fallen = 0;
+  biasInit();
+
+  // Reset PID
+  myPID.SetMode(MANUAL);
+  /* Force PID I-term and output to 0 */
+  myPID.SetOutputLimits(0.0, 1.0);// Force min to 0
+  myPID.SetOutputLimits(-1.0, 0.0);// Force max to 0
+  
+  PID_init();
 }
 

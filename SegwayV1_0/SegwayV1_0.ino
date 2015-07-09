@@ -1,40 +1,47 @@
-/* Changelog: FilterV4_Kalman
+/* Changelog: SegwayV1.0
 
-* Implemented Kalman Filter instead of Complementary
-  See: -gyro_readDAngle(), -filter(),
-       +gyro_readRate(), +kalmanCalculate()
-* Updated code to be Arduino Due compatible
+* Motor control transferred to RoboteQ controller
+  motorControl() now converts & sends speed to RoboteQ
+* Moved integration of gyro angular ROC from 
+  gyro_readDAngle() to filter()
+* Renamed gyro_readDAngle() to gyro_readRate() to
+  reflect the change
+* Replaced reset function to simulate a program restart
+  rather than actually restarting the program
+  (see: reset() in Head.h)
 
+** Summary ** (- = removed, + = added, ~ = changed)
+  - softwareReset()    - gyro_readDAngle()
+  + reset()            + gyro_readRate()
+
+  ~ motorControl()     ~ filter()
 */
 
 #include <Wire.h>
 #include <L3G.h>
 #include <PID_v1.h>
-#include <Adafruit_MotorShield.h>
-#include "Head.h"
-//#include <SegwayV4.h>// Contains all functions, global vars, etc
+#include <LSM303.h>
+#include "Head.h"// Contains function definitions
 
 /********************** SETUP **********************/
 void setup(){
   pinMode(accel_y_pin, INPUT);
-  pinMode(switchPin, INPUT_PULLUP);// Engage pullup resistor for switch
+  pinMode(switchPin, INPUT_PULLUP);// Engage pullup resistor
   pinMode(LEDpin, OUTPUT);
   
   Serial.begin(115200);
   Wire.begin();
   
   print3("K vals: kp = ", kp, ", ki = ", ki, ", kd = ", kd, "\n");
-  delay(2000);// Allow time for user to flip switch and edit tunings
-  
-  while(digitalRead(switchPin)){// Wait for switch to be flipped on
-    if(checkSerialMon()) updateTunings();// Handle serial input, if any
-    
-    delay(250);
-  }
+
+  while(digitalRead(switchPin)) delay(250);
   
   // Initialize Gyro
   while(!gyro.init());
   gyro.enableDefault();
+
+  while(!compass.init());
+  compass.enableDefault();
   
   /* Stabilization delay */
   println("Stabilize the robot.");
@@ -43,7 +50,6 @@ void setup(){
   
   biasInit();
   PID_init(); 
-  AFMS.begin();
   
   digitalWrite(LEDpin, HIGH);// Ready to go
   
@@ -55,30 +61,34 @@ void setup(){
 void loop(){
   static int prevSwState = 0;// Power switch state tracker
   static double gyro_rate, accel_angle;
-  static double res = 0;
   
-  /* Switch handling: Stops running if the switch is flipped off, then restarts sketch
-     when flipped back on */
+  /* Switch handling: Stops running if the switch is flipped off,
+     then resets sketch when flipped back on - see reset() */
   while(digitalRead(switchPin)){// Loop while switch is off
     if(prevSwState == 0){
       digitalWrite(LEDpin, LOW);
       prevSwState = 1;
       motorControl(0);
       println("Robot is now off. Flip the switch to turn on.");
+      print3("kp = ", kp, ", ki = ", ki, ", kd = ", kd, "\n");
     }
-    delay(500);
+    
+    if(checkSerialMon()) updateTunings();// Handle serial input
+    
+    delay(250);
   }
   if(prevSwState == 1){// Switch turned back on
-    software_Reset();// See std.h
+    reset();// See Head.h
+    prevSwState = 0;
   }
-  
+
   
   if(checkSerialMon()) updateTunings();
   
   gyro_rate = gyro_readRate();
   accel_angle = accel_readAngle();
   
-  input = kalmanCalculate(accel_angle, gyro_rate, loop_time);// Filter angle reading
+  input = filter(gyro_rate, accel_angle);// Filter angle reading
   print(input);
   myPID.Compute();
   output = PID_Hist(output);// Smooth PID output
@@ -90,7 +100,7 @@ void loop(){
   }
   
   if(!fallen) motorControl(output);
-  else print1("\t", fallen, "");;
+  else print("\tFallen");
   
   println();
   delay(loop_time);
