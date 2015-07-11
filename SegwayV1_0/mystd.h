@@ -3,60 +3,60 @@
 /* Printing definitions, intended to make printing combinations of strings
    and values to the Serial moniter less painful and more concise. */
 
-// print: prints the given string to the serial moniter
-#define print(x) Serial.print(x)
+// Print: Prints the given string to the serial moniter
+#define Print(x) Serial.print(x)
 
-// println: prints the given string to the serial moniter, appending a nl
-#define println(x) Serial.println(x)
+// Println: Prints the given string to the serial moniter, appending a nl
+#define Println(x) Serial.println(x)
 
-/* print1: prints the given string string1, followed by the given value a,
+/* Print1: Prints the given string string1, followed by the given value a,
            followed by the second string string2 */
-#define print1(str1, a, str2) print(str1), print(a), print(str2)
+#define Print1(str1, a, str2) Print(str1), Print(a), Print(str2)
 
-// print2: Extension of print1 for 3 strings and 2 values
-#define print2(str1, a, str2, b, str3) print1(str1, a, str2), print(b),	\
-    print(str3)
+// Print2: Extension of Print1 for 3 strings and 2 values
+#define Print2(str1, a, str2, b, str3) Print1(str1, a, str2), Print(b),	\
+    Print(str3)
 
-// print3: Extension of print1 for 4 strings and 3 values
-#define print3(str1, a, str2, b, str3, c, str4)		\
-  print2(str1, a, str2, b, str3), print(c), print(str4)
+// Print3: Extension of Print1 for 4 strings and 3 values
+#define Print3(str1, a, str2, b, str3, c, str4)		\
+  Print2(str1, a, str2, b, str3), Print(c), Print(str4)
 
-// print4: Extension of print1 for 5 strings and 4 values
-#define print4(str1, a, str2, b, str3, c, str4, d, str5)		\
-  print3(str1, a, str2, b, str3, c, str4), print(d), print(str5)
+// Print4: Extension of Print1 for 5 strings and 4 values
+#define Print4(str1, a, str2, b, str3, c, str4, d, str5)		\
+  Print3(str1, a, str2, b, str3, c, str4), Print(d), Print(str5)
 
-// print5: Extension of print1 for 6 strings and 5 values
-#define print5(str1, a, str2, b, str3, c, str4, d, str5, e, str6)	\
-  print4(str1, a, str2, b, str3, c, str4, d, str5), print(e), print(str6)
+// Print5: Extension of Print1 for 6 strings and 5 values
+#define Print5(str1, a, str2, b, str3, c, str4, d, str5, e, str6)	\
+  Print4(str1, a, str2, b, str3, c, str4, d, str5), Print(e), Print(str6)
 
-// print6: Extension of print1 for 7 strings and 6 values
-#define print6(str1, a, str2, b, str3, c, str4, d, str5, e, str6, f, str7) \
-  print5(str1, a, str2, b, str3, c, str4, d, str5, e, str6), print(f),\
-  print(str7)
+// Print6: Extension of Print1 for 7 strings and 6 values
+#define Print6(str1, a, str2, b, str3, c, str4, d, str5, e, str6, f, str7) \
+  Print5(str1, a, str2, b, str3, c, str4, d, str5, e, str6), Print(f),\
+  Print(str7)
 
-// print7: Extention of print1 for 8 strings and 7 values
-#define print7(str1, a, str2, b, str3, c, str4, d, str5, e, str6, f, str7, \
+// Print7: Extention of Print1 for 8 strings and 7 values
+#define Print7(str1, a, str2, b, str3, c, str4, d, str5, e, str6, f, str7, \
 	       g, str8) \
-  print6(str1, a, str2, b, str3, c, str4, d, str5, e, str6, f, str7), \
-  print(g), print(str8)
+  Print6(str1, a, str2, b, str3, c, str4, d, str5, e, str6, f, str7), \
+  Print(g), Print(str8)
 
-// print8: Extension of print1 for 9 strings and 8 values
-#define print8(str1, a, str2, b, str3, c, str4, d, str5, e, str6, f, str7, \
+// Print8: Extension of Print1 for 9 strings and 8 values
+#define Print8(str1, a, str2, b, str3, c, str4, d, str5, e, str6, f, str7, \
 	       g, str8, h, str9) \
-  print7(str1, a, str2, b, str3, c, str4, d, str5, e, str6, f, str7, g, \
-	 str8), print(h), print(str9)
+  Print7(str1, a, str2, b, str3, c, str4, d, str5, e, str6, f, str7, g, \
+	 str8), Print(h), Print(str9)
 
-// print9: Extension of print1 for 10 strings and 9 values
-#define print9(str1, a, str2, b, str3, c, str4, d, str5, e, str6, f, str7, \
+// Print9: Extension of Print1 for 10 strings and 9 values
+#define Print9(str1, a, str2, b, str3, c, str4, d, str5, e, str6, f, str7, \
 	       g, str8, h, str9, i, str10) \
-  print8(str1, a, str2, b, str3, c, str4, d, str5, e, str6, f, str7, g,\
-	 str8, h, str9), print(i), print(str10)
+  Print8(str1, a, str2, b, str3, c, str4, d, str5, e, str6, f, str7, g,\
+	 str8, h, str9), Print(i), Print(str10)
 
-// print10: Extension of print1 for 11 strings and 10 values
-#define print10(str1, a, str2, b, str3, c, str4, d, str5, e, str6, f, str7,\
+// Print10: Extension of Print1 for 11 strings and 10 values
+#define Print10(str1, a, str2, b, str3, c, str4, d, str5, e, str6, f, str7,\
 		g, str8, h, str9, i, str10, j, str11) \
-  print9(str1, a, str2, b, str3, c, str4, d, str5, e, str6, f, str7, g,\
-	 str8, h, str9, i, str10), print(j), print(str11)
+  Print9(str1, a, str2, b, str3, c, str4, d, str5, e, str6, f, str7, g,\
+	 str8, h, str9, i, str10), Print(j), Print(str11)
 
 /*************************************************************************/
 /* Character interpretation definitions */

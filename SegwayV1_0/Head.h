@@ -78,7 +78,7 @@ void gyro_calcBias(){
     delay(50);
   }
   gyro_bias = gyro_bias/sampleNum;
-  print1("Gyro Bias: ", gyro_bias, "");
+  Print1("Gyro Bias: ", gyro_bias, "");
 }
 
 /* accel_calcBias:
@@ -95,15 +95,15 @@ void accel_calcBias(){
     delay(50);
   }
   accel_bias = accel_bias/sampleNum;
-  print1("\tAccel Bias: ", accel_bias, "\n");
+  Print1("\tAccel Bias: ", accel_bias, "\n");
 }
 
 // Wrapper function for bias initialization
 void biasInit(){
-  println("Beginning bias initialization...");
+  Println("Beginning bias initialization...");
   gyro_calcBias();
   accel_calcBias();
-  println("Initialization complete.");
+  Println("Initialization complete.");
 }
 
 
@@ -165,10 +165,15 @@ double filter(double gyro_rate, double accel_angle){
    1 - 255      = Forward
 */
 void motorControl(int spd){
-  // Convert speed value to range required by roboteQ controller
-  spd = map(spd, -255, 255, 0, 1024);
-  analogWrite(DAC0, spd);// Send speed to RoboteQ motor controller
-  analogWrite(DAC1, spd);
+  spd /= 2;
+  String hSpd = String(abs(spd), HEX);// Convert to hex string
+  if(spd < 0){
+    Serial1.print("!a"), Serial1.println(hSpd);
+    Serial1.print("!b"), Serial1.println(hSpd);
+  }else{
+    Serial1.print("!A"), Serial1.println(hSpd);
+    Serial1.print("!B"), Serial1.println(hSpd);
+  }
 }
 
 /* updateTunings:
@@ -188,19 +193,19 @@ void updateTunings(void){
     Serial_RmWhiteSpc();// See std.h
     
     if(var == 'p'){
-      print2("Changed kp value from ", kp, " to ", res, "\n");
+      Print2("Changed kp value from ", kp, " to ", res, "\n");
       kp = res;
     }else if(var == 'i'){
-      print2("Changed ki value from ", ki, " to ", res, "\n");
+      Print2("Changed ki value from ", ki, " to ", res, "\n");
       ki = res;
     }if(var == 'd'){
-      print2("Changed kd value from ", kd, " to ", res, "\n");
+      Print2("Changed kd value from ", kd, " to ", res, "\n");
       kd = res;
     }
     myPID.SetTunings(kp, ki, kd);
-    print3("K vals: kp = ", kp, ", ki = ", ki, ", kd = ", kd, "\n");
+    Print3("K vals: kp = ", kp, ", ki = ", ki, ", kd = ", kd, "\n");
   }else if(var == '.'){
-    print3("K vals: kp = ", kp, ", ki = ", ki, ", kd = ", kd, "\n");
+    Print3("K vals: kp = ", kp, ", ki = ", ki, ", kd = ", kd, "\n");
   }
 }
 
@@ -214,12 +219,11 @@ void reset(void){
   fallen = 0;
   biasInit();
 
-  // Reset PID
+  /* Reset PID */
   myPID.SetMode(MANUAL);
-  /* Force PID I-term and output to 0 */
+  // Force PID I-term and output to 0
   myPID.SetOutputLimits(0.0, 1.0);// Force min to 0
   myPID.SetOutputLimits(-1.0, 0.0);// Force max to 0
-  
   PID_init();
 }
 

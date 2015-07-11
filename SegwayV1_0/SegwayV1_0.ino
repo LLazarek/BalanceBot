@@ -30,9 +30,10 @@ void setup(){
   pinMode(LEDpin, OUTPUT);
   
   Serial.begin(115200);
+  Serial1.begin(9600);
   Wire.begin();
   
-  print3("K vals: kp = ", kp, ", ki = ", ki, ", kd = ", kd, "\n");
+  Print3("K vals: kp = ", kp, ", ki = ", ki, ", kd = ", kd, "\n");
 
   while(digitalRead(switchPin)) delay(250);
   
@@ -44,7 +45,7 @@ void setup(){
   compass.enableDefault();
   
   /* Stabilization delay */
-  println("Stabilize the robot.");
+  Println("Stabilize the robot.");
   motorControl(0);
   delay(2000);
   
@@ -53,7 +54,7 @@ void setup(){
   
   digitalWrite(LEDpin, HIGH);// Ready to go
   
-  println("FiltAngle\tPIDOut\tFallen");// Labels for data analysis
+  Println("FiltAngle\tPIDOut\tFallen");// Labels for data analysis
 }
 
 
@@ -69,8 +70,8 @@ void loop(){
       digitalWrite(LEDpin, LOW);
       prevSwState = 1;
       motorControl(0);
-      println("Robot is now off. Flip the switch to turn on.");
-      print3("kp = ", kp, ", ki = ", ki, ", kd = ", kd, "\n");
+      Println("Robot is now off. Flip the switch to turn on.");
+      Print3("kp = ", kp, ", ki = ", ki, ", kd = ", kd, "\n");
     }
     
     if(checkSerialMon()) updateTunings();// Handle serial input
@@ -89,10 +90,10 @@ void loop(){
   accel_angle = accel_readAngle();
   
   input = filter(gyro_rate, accel_angle);// Filter angle reading
-  print(input);
+  Print(input);
   myPID.Compute();
   output = PID_Hist(output);// Smooth PID output
-  print1("\t", output, "");
+  Print1("\t", output, "");
   
   if(input < -17 || input > 30){// Robot has fallen over
     fallen = 1;
@@ -100,8 +101,8 @@ void loop(){
   }
   
   if(!fallen) motorControl(output);
-  else print("\tFallen");
+  else Print("\tFallen");
   
-  println();
+  Println();
   delay(loop_time);
 }
