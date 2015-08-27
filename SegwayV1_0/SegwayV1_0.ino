@@ -40,7 +40,7 @@ void setup(){
   SPI.begin();
   SPI.beginTransaction(SPISettings(14000000, 
   MSBFIRST, SPI_MODE0));
-  
+
   // Initialize Gyro
   while(!gyro.init());
   gyro.enableDefault();
