@@ -10,6 +10,8 @@
 #define LEDpin 2
 #define switchPin 7
 #define histLen 9 // Number of entries to use in rolling average
+#define DAC1 10
+#define DAC2 8
 
 L3G gyro;
 LSM303 compass;
@@ -158,20 +160,19 @@ double filter(double gyro_rate, double accel_angle){
    @params
    volt:           The voltage analog signal to be output
 */
-void DAC(float volt)
+void DAC(int dac, float volt)
 {
-  unsigned short bitPattern = (int)(volt*4095/5);// 4095 == 5 volts
-  byte upperByte=0; 
-  byte lowerByte=0;
-  upperByte=highByte(bitPattern);
-  lowerByte=lowByte(bitPattern);
+  //if(dac == 8) volt *= 25;
+  unsigned short bitPattern = (int)(volt*4095/5);// 4095/5 per volt
+  byte upperByte=highByte(bitPattern); 
+  byte lowerByte=lowByte(bitPattern);
   upperByte |=0x30;//the 3 is for control | 0x30 = HEX | 3 = Control Nibble (4-bits) | 0 = 2nd Part of MSB Nibble (4-bits) -> 1 byte
  // Serial.println(upperByte);
  // Serial.println(lowerByte);
-  digitalWrite(10, LOW);
+  digitalWrite(dac, LOW);
   SPI.transfer(upperByte);
   SPI.transfer(lowerByte);
-  digitalWrite(10, HIGH);
+  digitalWrite(dac, HIGH);
 }
 
 /* motorControl:
@@ -188,7 +189,8 @@ void DAC(float volt)
 void motorControl(int spd){
   spd = constrain(spd, -250, 250);
   spd += 250;
-  DAC((float)spd/100);
+  DAC(DAC1, (float)spd/100);
+  DAC(DAC2, 5.0 - (float)spd/100);// Polarity of one motor is flipped
 }
 
 /* robotEQ_init:
@@ -196,7 +198,8 @@ void motorControl(int spd){
    2.5V signal for 5 sec. 
 */
 void robotEQ_init(){
-  DAC(2.5);
+  DAC(DAC1, 2.5);
+  DAC(DAC2, 2.5);
   delay(5000);
 }
 

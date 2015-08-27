@@ -29,6 +29,10 @@ void setup(){
   pinMode(accel_y_pin, INPUT);
   pinMode(switchPin, INPUT_PULLUP);// Engage pullup resistor
   pinMode(LEDpin, OUTPUT);
+  pinMode(DAC1, OUTPUT);
+  pinMode(DAC2, OUTPUT);
+  digitalWrite(DAC1, HIGH);// default DAC ss pin state
+  digitalWrite(DAC2, HIGH);
   
   Serial.begin(115200);
   Wire.begin();
@@ -40,7 +44,7 @@ void setup(){
   SPI.begin();
   SPI.beginTransaction(SPISettings(14000000, 
   MSBFIRST, SPI_MODE0));
-  
+
   // Initialize Gyro
   while(!gyro.init());
   gyro.enableDefault();
