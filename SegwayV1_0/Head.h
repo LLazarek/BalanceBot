@@ -137,7 +137,6 @@ double accel_readAngle(){
   return (accel_y - accel_bias)*accel_sensitivity;
 }
 
-
 /* filter:
    Applys Complementary filter to the sensors to create an estimated angle
 
@@ -153,6 +152,28 @@ double filter(double gyro_rate, double accel_angle){
   return filtered_angle;
 }
 
+/* DAC:
+   Controls the Digital to Analog Converter to ouput the given voltage analog signal
+
+   @params
+   volt:           The voltage analog signal to be output
+*/
+void DAC(float volt)
+{
+  unsigned short bitPattern = (int)(volt*4095/5);// 4095 == 5 volts
+  byte upperByte=0; 
+  byte lowerByte=0;
+  upperByte=highByte(bitPattern);
+  lowerByte=lowByte(bitPattern);
+  upperByte |=0x30;//the 3 is for control | 0x30 = HEX | 3 = Control Nibble (4-bits) | 0 = 2nd Part of MSB Nibble (4-bits) -> 1 byte
+ // Serial.println(upperByte);
+ // Serial.println(lowerByte);
+  digitalWrite(10, LOW);
+  SPI.transfer(upperByte);
+  SPI.transfer(lowerByte);
+  digitalWrite(10, HIGH);
+}
+
 /* motorControl:
    Sends motor control output from PID calculation to the RoboteQ
    motor controller
@@ -165,15 +186,18 @@ double filter(double gyro_rate, double accel_angle){
    1 - 255      = Forward
 */
 void motorControl(int spd){
-  spd /= 2;
-  String hSpd = String(abs(spd), HEX);// Convert to hex string
-  if(spd < 0){
-    Serial1.print("!a"), Serial1.println(hSpd);
-    Serial1.print("!b"), Serial1.println(hSpd);
-  }else{
-    Serial1.print("!A"), Serial1.println(hSpd);
-    Serial1.print("!B"), Serial1.println(hSpd);
-  }
+  spd = constrain(spd, -250, 250);
+  spd += 250;
+  DAC((float)spd/100);
+}
+
+/* robotEQ_init:
+   Initializes the RobotEQ motor controller to Analog Control Mode with a constant
+   2.5V signal for 5 sec. 
+*/
+void robotEQ_init(){
+  DAC(2.5);
+  delay(5000);
 }
 
 /* updateTunings:

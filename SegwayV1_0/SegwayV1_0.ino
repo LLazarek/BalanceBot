@@ -21,6 +21,7 @@
 #include <L3G.h>
 #include <PID_v1.h>
 #include <LSM303.h>
+#include <SPI.h>
 #include "Head.h"// Contains function definitions
 
 /********************** SETUP **********************/
@@ -30,12 +31,15 @@ void setup(){
   pinMode(LEDpin, OUTPUT);
   
   Serial.begin(115200);
-  Serial1.begin(9600);
   Wire.begin();
   
   Print3("K vals: kp = ", kp, ", ki = ", ki, ", kd = ", kd, "\n");
 
   while(digitalRead(switchPin)) delay(250);
+
+  SPI.begin();
+  SPI.beginTransaction(SPISettings(14000000, 
+  MSBFIRST, SPI_MODE0));
   
   // Initialize Gyro
   while(!gyro.init());
@@ -48,9 +52,10 @@ void setup(){
   Println("Stabilize the robot.");
   motorControl(0);
   delay(2000);
-  
+
   biasInit();
   PID_init(); 
+  robotEQ_init();
   
   digitalWrite(LEDpin, HIGH);// Ready to go
   
