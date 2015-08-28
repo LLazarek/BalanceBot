@@ -36,14 +36,13 @@ void setup(){
   
   Serial.begin(115200);
   Wire.begin();
+  SPI.begin();
+  SPI.beginTransaction(SPISettings(14000000, 
+  MSBFIRST, SPI_MODE0));
   
   Print3("K vals: kp = ", kp, ", ki = ", ki, ", kd = ", kd, "\n");
 
   while(digitalRead(switchPin)) delay(250);
-
-  SPI.begin();
-  SPI.beginTransaction(SPISettings(14000000, 
-  MSBFIRST, SPI_MODE0));
 
   // Initialize Gyro
   while(!gyro.init());
@@ -58,7 +57,9 @@ void setup(){
   delay(2000);
 
   biasInit();
+  Print("A");
   PID_init(); 
+  Print("B");
   robotEQ_init();
   
   digitalWrite(LEDpin, HIGH);// Ready to go
@@ -89,6 +90,7 @@ void loop(){
   }
   if(prevSwState == 1){// Switch turned back on
     reset();// See Head.h
+    digitalWrite(LEDpin, HIGH);
     prevSwState = 0;
   }
 

@@ -12,6 +12,7 @@
 #define histLen 9 // Number of entries to use in rolling average
 #define DAC1 10
 #define DAC2 8
+#define two_p_five 2.54 // The DACs don't quite output 2.5V exactly - use this val to init
 
 L3G gyro;
 LSM303 compass;
@@ -26,7 +27,8 @@ double hist[histLen];// History for rolling average of PID output
 
 // PID
 double setpoint, input, output;
-double kp = 150, ki = 2000, kd = 8;
+double kp = 50, ki = 0, kd = 0;
+//150, 2000, 8
 PID myPID(&input, &output, &setpoint, kp, ki, kd, DIRECT);
 
 /************************** Begin Functions ************************/
@@ -189,18 +191,21 @@ void DAC(int dac, float volt)
 void motorControl(int spd){
   spd = constrain(spd, -250, 250);
   spd += 250;
-  DAC(DAC1, (float)spd/100);
-  DAC(DAC2, 5.0 - (float)spd/100);// Polarity of one motor is flipped
+  DAC(DAC1, 5.0 - (float)spd/100);// Polarity of one motor is flipped
+  DAC(DAC2, (float)spd/100);
 }
 
 /* robotEQ_init:
-   Initializes the RobotEQ motor controller to Analog Control Mode with a constant
-   2.5V signal for 5 sec. 
+   Ensures that the RobotEQ motor controller is initialized to Analog Control Mode with
+   a constant 2.5V signal for 1 sec. 
 */
 void robotEQ_init(){
-  DAC(DAC1, 2.5);
-  DAC(DAC2, 2.5);
-  delay(5000);
+  DAC(DAC1, 2.4);
+  DAC(DAC2, 2.4);
+  delay(1000);
+  DAC(DAC1, two_p_five);
+  DAC(DAC2, two_p_five);
+  delay(1000);
 }
 
 /* updateTunings:
@@ -252,5 +257,8 @@ void reset(void){
   myPID.SetOutputLimits(0.0, 1.0);// Force min to 0
   myPID.SetOutputLimits(-1.0, 0.0);// Force max to 0
   PID_init();
+
+  //Re-init RobotEQ
+  robotEQ_init();
 }
 
