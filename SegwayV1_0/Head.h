@@ -14,6 +14,8 @@
 #define DAC2 8
 #define two_p_five 2.54 // The DACs don't quite output 2.5V exactly - use this val to init
 
+#define PRINT_STATUS  Print5("K vals: kp = ", kp, ", ki = ", ki, ", kd = ", kd, "\nleft = ", DAC1_mult, ", right = ", DAC2_mult, "\n")
+
 L3G gyro;
 LSM303 compass;
 
@@ -30,6 +32,9 @@ double setpoint, input, output;
 double kp = 10, ki = 1, kd = 2; // PID tuning values
 //150, 2000, 8
 PID myPID(&input, &output, &setpoint, kp, ki, kd, DIRECT); // PID object
+
+double DAC1_mult = 1.0, DAC2_mult = 1.0;
+bool kill = 0;
 
 /************************** Begin Functions ************************/
 
@@ -229,8 +234,8 @@ void DAC(int dac, float volt)
 void motorControl(int spd){
   spd = constrain(spd, -250, 250);
   spd += 250;
-  DAC(DAC1, 5.0 - (float)spd/100);// Polarity of one motor is flipped
-  DAC(DAC2, (float)spd/100);
+  DAC(DAC1, 5.0 - ((float)spd*DAC1_mult)/100);// Polarity of one motor is flipped
+  DAC(DAC2, ((float)spd*DAC2_mult)/100);
 }
 
 /* robotEQ_init:
@@ -259,6 +264,11 @@ void robotEQ_init(){
    Valid input format: "kp 55.6", "kp53",  "p 53", "p55.6", "ki 53"...
    Invalid input is thrown away
 
+   Additional input accepted:
+   "l1.2" = update multiplier for DAC1 to be 1.2
+   "r0.8" = update multiplier for DAC2 to be 0.8
+   "s"    = emergency override/kill the segway until switch is flipped OFF
+
    @params
    void
 
@@ -270,7 +280,10 @@ void updateTunings(){
   double res;
   
   var = Serial_ReadChar();// See std.h
-  if(var != -1 && (var == 'p' || var == 'i' || var == 'd')){
+  if(var != -1 && var == 's'){
+    Print("Emergency software kill/override activated.\n");
+    kill = true;
+  }else if(var != -1 && (var == 'p' || var == 'i' || var == 'd' || var == 'l' || var == 'r')){
     res = Serial_ReadFloat();// See std.h
     Serial_RmWhiteSpc();// See std.h
     
@@ -280,14 +293,20 @@ void updateTunings(){
     }else if(var == 'i'){
       Print2("Changed ki value from ", ki, " to ", res, "\n");
       ki = res;
-    }if(var == 'd'){
+    }else if(var == 'd'){
       Print2("Changed kd value from ", kd, " to ", res, "\n");
       kd = res;
+    }else if(var == 'l'){
+      Print2("Changed left wheel mult from ", DAC1_mult, " to ", res, "\n");
+      DAC1_mult = res;
+    }else if(var == 'r'){
+      Print2("Changed right wheel mult from ", DAC2_mult, " to ", res, "\n");
+      DAC2_mult = res;
     }
     myPID.SetTunings(kp, ki, kd);
-    Print3("K vals: kp = ", kp, ", ki = ", ki, ", kd = ", kd, "\n");
+    PRINT_STATUS;
   }else if(var == '.'){
-    Print3("K vals: kp = ", kp, ", ki = ", ki, ", kd = ", kd, "\n");
+    PRINT_STATUS;
   }
 }
 

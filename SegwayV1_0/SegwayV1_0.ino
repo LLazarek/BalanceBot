@@ -40,7 +40,7 @@ void setup(){
   SPI.beginTransaction(SPISettings(14000000, 
                        MSBFIRST, SPI_MODE0));
   
-  Print3("K vals: kp = ", kp, ", ki = ", ki, ", kd = ", kd, "\n");
+  PRINT_STATUS;
 
   while(digitalRead(switchPin)) delay(250);
 
@@ -57,9 +57,7 @@ void setup(){
   delay(2000);
 
   biasInit();
-  Print("A");
-  PID_init(); 
-  Print("B");
+  PID_init();
   robotEQ_init();
   
   digitalWrite(LEDpin, HIGH);// Ready to go
@@ -71,7 +69,25 @@ void setup(){
 /*********************** LOOP ************************/
 void loop(){
   static int prevSwState = 0;// Power switch state tracker
+  static int prevKillState = 0;// Kill/override state tracker
   static double gyro_rate, accel_angle;
+
+  while(kill){
+    if(kill && prevKillState == 0){
+      digitalWrite(LEDpin, LOW);
+      prevKillState = 1;
+      motorControl(0);
+      Println("Emergency software kill has been activated; robot is now off. Flip the switch to OFF to re-enter normal execution.");
+      PRINT_STATUS;
+    }
+
+    // Exit emergency kill loop once switch has been flipped to OFF
+    if(digitalRead(switchPin)) kill = prevKillState = 0;
+    
+    if(checkSerialMon()) updateTunings();// Handle serial input
+    
+    delay(250);
+  }
   
   /* Switch handling: Stops running if the switch is flipped off,
      then resets sketch when flipped back on - see Head.h/reset() */
@@ -81,7 +97,7 @@ void loop(){
       prevSwState = 1;
       motorControl(0);
       Println("Robot is now off. Flip the switch to turn on.");
-      Print3("kp = ", kp, ", ki = ", ki, ", kd = ", kd, "\n");
+      PRINT_STATUS;
     }
     
     if(checkSerialMon()) updateTunings();// Handle serial input
