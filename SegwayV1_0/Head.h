@@ -27,14 +27,20 @@ double hist[histLen];// History for rolling average of PID output
 
 // PID
 double setpoint, input, output;
-double kp = 50, ki = 0, kd = 0;
+double kp = 10, ki = 1, kd = 2; // PID tuning values
 //150, 2000, 8
-PID myPID(&input, &output, &setpoint, kp, ki, kd, DIRECT);
+PID myPID(&input, &output, &setpoint, kp, ki, kd, DIRECT); // PID object
 
 /************************** Begin Functions ************************/
 
 /* PID_init:
    Initializes and starts the PID controller
+
+   @params
+   void
+
+   @return
+   void
 */
 void PID_init(){
   setpoint = 0;
@@ -71,6 +77,12 @@ double PID_Hist(double output){
 /* gyro_calcBias:
    Calculates the gyroscope bias
    (See: sampleNum)
+
+   @params
+   void
+
+   @return
+   void
 */
 void gyro_calcBias(){
   gyro_bias = 0;
@@ -88,6 +100,12 @@ void gyro_calcBias(){
 /* accel_calcBias:
    Calculates the accelerometer bias
    (See: sampleNum)
+
+   @params
+   void
+
+   @return
+   void
 */
 void accel_calcBias(){
   accel_bias = 0;
@@ -102,7 +120,16 @@ void accel_calcBias(){
   Print1("\tAccel Bias: ", accel_bias, "\n");
 }
 
-// Wrapper function for bias initialization
+/* biasInit:  
+   Performs bias initialization for gyro and accel.
+   (See: gyro_calcBias(), accel_calcBias())
+
+   @params
+   void
+
+   @return
+   void
+*/
 void biasInit(){
   Println("Beginning bias initialization...");
   gyro_calcBias();
@@ -114,6 +141,9 @@ void biasInit(){
 /* gyro_readRate:
    Reads gyro angular velocity data
    (See: gyro_bias, gyro_calcBias(), gyro_conversion_DPS)
+
+   @params
+   void
 
    @return
    The approximate angular rate of change
@@ -129,6 +159,9 @@ double gyro_readRate(){
 /* accel_readAngle:
    Reads accelerometer data and converts it into an approximate angle
    (See: accel_bias, accel_calcBias(), accel_sensitivity)
+
+   @params
+   void
 
    @return
    The approximate angle reading
@@ -157,20 +190,22 @@ double filter(double gyro_rate, double accel_angle){
 }
 
 /* DAC:
-   Controls the Digital to Analog Converter to ouput the given voltage analog signal
+   Controls one Digital to Analog Converter to ouput the given voltage analog signal
+   using SPI to communicate with the DAC.
 
    @params
+   dac:            The DAC chip to control
    volt:           The voltage analog signal to be output
+
+   @return
+   void
 */
 void DAC(int dac, float volt)
 {
-  //if(dac == 8) volt *= 25;
   unsigned short bitPattern = (int)(volt*4095/5);// 4095/5 per volt
   byte upperByte=highByte(bitPattern); 
   byte lowerByte=lowByte(bitPattern);
   upperByte |=0x30;//the 3 is for control | 0x30 = HEX | 3 = Control Nibble (4-bits) | 0 = 2nd Part of MSB Nibble (4-bits) -> 1 byte
- // Serial.println(upperByte);
- // Serial.println(lowerByte);
   digitalWrite(dac, LOW);
   SPI.transfer(upperByte);
   SPI.transfer(lowerByte);
@@ -184,9 +219,12 @@ void DAC(int dac, float volt)
    @params
    spd:       The speed for the motors (in range (-255, 255), signed)
               indicating direction of rotation.
-   -255 - -1    = Backward
-   0            = Stop
-   1 - 255      = Forward
+              -255 - -1    = Backward
+              0            = Stop
+              1 - 255      = Forward
+
+   @return
+   void
 */
 void motorControl(int spd){
   spd = constrain(spd, -250, 250);
@@ -198,6 +236,12 @@ void motorControl(int spd){
 /* robotEQ_init:
    Ensures that the RobotEQ motor controller is initialized to Analog Control Mode with
    a constant 2.5V signal for 1 sec. 
+
+   @params
+   void
+
+   @return
+   void
 */
 void robotEQ_init(){
   DAC(DAC1, 2.4);
@@ -214,8 +258,14 @@ void robotEQ_init(){
 
    Valid input format: "kp 55.6", "kp53",  "p 53", "p55.6", "ki 53"...
    Invalid input is thrown away
+
+   @params
+   void
+
+   @return
+   void
 */
-void updateTunings(void){
+void updateTunings(){
   char var;
   double res;
   
@@ -244,8 +294,14 @@ void updateTunings(void){
 /* reset:
    Re-initializes all necessary variables etc to restart the
    balancing algorithm
+
+   @params
+   void
+
+   @return
+   void
 */
-void reset(void){
+void reset(){
   filtered_angle = 0;
   for(int i = 0; i < histLen; i++) hist[i] = 0;
   fallen = 0;

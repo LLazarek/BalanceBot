@@ -38,7 +38,7 @@ void setup(){
   Wire.begin();
   SPI.begin();
   SPI.beginTransaction(SPISettings(14000000, 
-  MSBFIRST, SPI_MODE0));
+                       MSBFIRST, SPI_MODE0));
   
   Print3("K vals: kp = ", kp, ", ki = ", ki, ", kd = ", kd, "\n");
 
@@ -74,7 +74,7 @@ void loop(){
   static double gyro_rate, accel_angle;
   
   /* Switch handling: Stops running if the switch is flipped off,
-     then resets sketch when flipped back on - see reset() */
+     then resets sketch when flipped back on - see Head.h/reset() */
   while(digitalRead(switchPin)){// Loop while switch is off
     if(prevSwState == 0){
       digitalWrite(LEDpin, LOW);
@@ -88,7 +88,7 @@ void loop(){
     
     delay(250);
   }
-  if(prevSwState == 1){// Switch turned back on
+  if(prevSwState == 1){// Switch turned back on from being off
     reset();// See Head.h
     digitalWrite(LEDpin, HIGH);
     prevSwState = 0;
