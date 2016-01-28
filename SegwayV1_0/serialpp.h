@@ -1,16 +1,30 @@
+/* Serial plus plus:
+   A small library for making working with the serial monitor simpler and more concise.
+*/
+
+#ifndef SERIALPP_H
+#define SERIALPP_H
+
 #include <Arduino.h>
 
-/* Printing definitions, intended to make printing combinations of strings
-   and values to the Serial moniter less painful and more concise. */
 
 // Print: Prints the given string to the serial moniter
 #define Print(x) Serial.print(x)
 
-// Println: Prints the given string to the serial moniter, appending a nl
+// Println: Prints the given string to the serial moniter, appending a newline
 #define Println(x) Serial.println(x)
 
 /* Print1: Prints the given string string1, followed by the given value a,
-           followed by the second string string2 */
+           followed by the second string string2
+
+	   == Example use ==
+	   Printing a variable value. Instead of:
+	     > Serial.print("x is ");
+	     > Serial.print(x);
+	     > Serial.println(" radians.");
+	   You can do:
+	     > Print1("x is ", x, " radians.\n");
+*/
 #define Print1(str1, a, str2) Print(str1), Print(a), Print(str2)
 
 // Print2: Extension of Print1 for 3 strings and 2 values
@@ -73,80 +87,61 @@
 /* checkSerialMon:
    Checks if there is data in the Serial buffer
 
+   @params
+   void
+   
    @return
-   0        if no data available
-   # > 0    if data available
+   int     0        if no data available
+           # > 0    if data available
 */
-int checkSerialMon(void){
-  return Serial.available();
-}
+int checkSerialMon(void);
 
 /* Serial_RmWhiteSpc:
    Removes white space from the Serial buffer
+
+   @params
+   void
+
+   @return
+   void
 */
-void Serial_RmWhiteSpc(void){
-  if(Serial.available() <= 0) return;
-  
-  char c = Serial.peek();
-  if(c == 13 || c == 10 || c == ' '){
-    Serial.read();
-    Serial_RmWhiteSpc();
-  }
-}
+void Serial_RmWhiteSpc(void);
 
 /* Serial_ReadChar:
    Reads a character from the Serial moniter
 
+   @params
+   void
+   
    @return:
-   -1                if no char could be read
-   char value        char successfully read
+   char    -1                if no char could be read
+            other            if char successfully read
 */
-char Serial_ReadChar(void){
-  if(Serial.available() > 0) return Serial.read();
-  else return -1;
-}
+char Serial_ReadChar(void);
 
 /* Serial_ReadInt:
    Reads an integer from the Serial moniter
 
+   @params
+   void
+   
    @ return:
-   -9999             if no int could be read
-   int value         int successfully read
+   int    -9999             if no int could be read
+           other            if int successfully read
 */
-int Serial_ReadInt(void){
-  if(Serial.available() > 0) return Serial.parseInt();
-  else return -9999;
-}
+int Serial_ReadInt(void);
 
-/* Serial_ReadFloat:
-   Reads a float/double from the Serial moniter (Max 14 digits)
+/* Serial_ReadDouble:
+   Reads a double from the Serial moniter (Max 14 digits)
 
+   @params
+   void
+   
    @ return:
-   -9999.99          if no float could be read
-   float value       float successfully read
+   double   -9999.99          if no double could be read
+             other            if double successfully read
 */
-float Serial_ReadFloat(void){
-  char arr[15], c;
-  if(Serial.available() > 0){
-    c = Serial.peek();
-    // Remove spaces, if any
-    if(c == ' ') Serial_RmWhiteSpc(), c = Serial.peek();
-    
-    for(int i = 0; i < 15 && chPartofNum(c); i++){
-      c = Serial.read();
-      arr[i] = c;
-      c = Serial.peek();
-    }
-    return atof(arr);
-  }else return -9999.99;
-}
-
-/**************************************************************************/
-/* Useful Arduino functions */
-
-/* software_Reset:
-   Restarts the arduino sketch
-*/
-void (* software_Reset) (void) = 0;
-
+double Serial_ReadDouble(void);
 /*************************************************************************/
+
+#endif
