@@ -129,6 +129,8 @@ void loop(){
   
   if(!fallen) motorControl(output);
   else Print("\tFallen");
+
+  Print1("\tPot: ", analogRead(A0), "");
   
   Println();
   delay(loop_time);
