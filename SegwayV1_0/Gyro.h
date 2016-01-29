@@ -10,13 +10,18 @@
 // Begin class Gyro
 class Gyro : public L3G {
 public:
-  Gyro() : bias(0.00) {
-    while(!(this -> init())){
-      Serial.println("Can't load gyro");
-      delay(1000);
-    }
-    this -> enableDefault();
-  }
+  Gyro() : bias(0.00) { }
+
+  /* Gyro::boot():
+     Performs one-time setup functions for gyro
+
+     @params
+     void
+
+     @return
+     void
+  */
+  void boot();
   
   /* Gyro::calcBias():
      Calculates the gyroscope bias

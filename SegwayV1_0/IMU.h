@@ -1,3 +1,6 @@
+/* Class IMU:
+ * Wrapper class for Gyro and Accel providing easy control of both for angular attitude calculations.
+*/
 #ifndef IMU_H
 #define IMU_H
 
@@ -6,7 +9,22 @@
 
 class IMU {
 public:
-  IMU(int Loop_Time) : angle(0.0), bias_sample_size(20), loop_time(Loop_Time) {}
+  IMU(int Loop_Time) : angle(0.0), bias_sample_size(20), loop_time(Loop_Time) { }
+
+  /* IMU::boot():
+     Performs one-time setup functions for IMU
+
+     @params
+     void
+
+     @return
+     void
+  */
+  void boot(){
+    accel.boot();
+    gyro.boot();
+    init();
+  }
   
   /* IMU::init():
      Performs bias initialization for gyro and accel.

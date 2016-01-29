@@ -11,17 +11,20 @@
 // Begin class Accel
 class Accel : public LSM303 {
 public:
-  Accel(): bias(0.00) {
-    Wire.begin();
-    pinMode(A0, INPUT); // Accel pin = A0
-    while(!(this -> init())){
-      Serial.println("Can't load accel");
-      delay(1000);
-    }
-    this -> enableDefault();
-  }
+  Accel(): bias(0.00) { }
+
+  /* Accel::boot():
+     Performs one-time setup functions for accel
+
+     @params
+     void
+
+     @return
+     void
+   */
+  void boot();
   
-  /* Accel::calcBias:
+  /* Accel::calcBias():
      Calculates the accelerometer bias
      (See: sampleNum)
 
@@ -33,7 +36,7 @@ public:
   */
   void calcBias(int sampleNum);
 
-  /* Accel::readAngle:
+  /* Accel::readAngle():
      Reads accelerometer data and converts it into an approximate angle
      (See: accel_bias, accel_calcBias(), accel_sensitivity)
 

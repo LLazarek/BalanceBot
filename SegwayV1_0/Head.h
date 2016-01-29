@@ -21,7 +21,7 @@ bool kill = 0;
 
 /************************** Begin Functions ************************/
 
-/* handleInput:
+/* handleInput():
    Reads data from the Serial moniter and interprets commands to update
    PID tuning variables during runtime
 
@@ -73,7 +73,7 @@ void handleInput(){
   }
 }
 
-/* reset:
+/* reset():
    Re-initializes all necessary variables etc to restart the
    balancing algorithm
 

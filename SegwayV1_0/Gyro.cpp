@@ -1,6 +1,14 @@
 #include "Gyro.h"
 #include "serialpp.h"
 
+void Gyro::boot(){
+  while(!(this -> init())){
+    Serial.println("Can't load gyro");
+    delay(1000);
+  }
+  this -> enableDefault();
+}
+
 void Gyro::calcBias(int sampleNum){
   bias = 0;
   

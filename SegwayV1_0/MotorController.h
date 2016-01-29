@@ -4,8 +4,19 @@
 // Begin class MotorController
 class MotorController {
 public:
-  MotorController();
+  MotorController() : DAC1_mult(1.0), DAC2_mult(1.0) { }
 
+  /* MotorController::boot():
+     Performs one-time setup functions for MotorController
+
+     @params
+     void
+
+     @return
+     void
+  */
+  void boot();
+  
   /* MotorController::init():
      Ensures that the RobotEQ motor controller is initialized to Analog Control Mode with
      a constant 2.5V signal for 1 sec. 

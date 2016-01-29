@@ -2,12 +2,12 @@
 #include "MotorController.h"
 #include "serialpp.h"
 
-
 #define two_p_five 2.54 // The DACs don't quite output 2.5V exactly - use this val to init
 #define DAC1 10         // Pin for DAC1
 #define DAC2 8          // Pin for DAC2
 
-MotorController::MotorController() : DAC1_mult(1.0), DAC2_mult(1.0) {
+
+void MotorController::boot(){
   pinMode(DAC1, OUTPUT);
   pinMode(DAC2, OUTPUT);
   SPI.begin();

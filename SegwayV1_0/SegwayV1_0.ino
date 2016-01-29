@@ -8,17 +8,19 @@
 /********************** SETUP **********************/
 void setup(){
   Serial.begin(115200);
-  Println("Hello!");
   pinMode(switchPin, INPUT_PULLUP);// Engage pullup resistor
   pinMode(LEDpin, OUTPUT);
+
+  imu.boot();
+  mc.boot();
   
   PRINT_STATUS;
 
-  while(digitalRead(switchPin)) delay(250);
+  while(digitalRead(switchPin)) delay(100);
 
-  mc.init();
   /* Stabilization delay */
   Println("Stabilize the robot.");
+  mc.init();
   mc.write(0);
   delay(2000);
 
