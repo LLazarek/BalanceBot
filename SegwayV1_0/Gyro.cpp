@@ -3,7 +3,7 @@
 
 void Gyro::boot(){
   while(!(this -> init())){
-    Serial.println("Can't load gyro");
+    Print("Unable to load gyro, please check IMU connection");
     delay(1000);
   }
   this -> enableDefault();

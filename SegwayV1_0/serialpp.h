@@ -1,5 +1,6 @@
-/* Serial plus plus:
-   A small library for making working with the serial monitor simpler and more concise.
+/* Class serialpp (Serial plus plus):
+   A wrapper for functions and macros relating to Serial communication with
+   the aim of making working with the serial monitor simpler and more concise.
 */
 
 #ifndef SERIALPP_H
@@ -82,9 +83,11 @@
 #define chPartofNum(c) (charIsDigit(c) || c == '.')
 
 /*************************************************************************/
-/* Serial reading functions */
 
-/* checkSerialMon:
+// Begin class serialpp
+class serialpp {
+public:
+/* serialpp::inputAvailable():
    Checks if there is data in the Serial buffer
 
    @params
@@ -94,9 +97,9 @@
    int     0        if no data available
            # > 0    if data available
 */
-int checkSerialMon(void);
+static int inputAvailable(void);
 
-/* Serial_RmWhiteSpc:
+/* serialpp::rmWhiteSpc():
    Removes white space from the Serial buffer
 
    @params
@@ -105,9 +108,9 @@ int checkSerialMon(void);
    @return
    void
 */
-void Serial_RmWhiteSpc(void);
+static void rmWhiteSpc(void);
 
-/* Serial_ReadChar:
+/* serialpp::readChar():
    Reads a character from the Serial moniter
 
    @params
@@ -117,9 +120,9 @@ void Serial_RmWhiteSpc(void);
    char    -1                if no char could be read
             other            if char successfully read
 */
-char Serial_ReadChar(void);
+static char readChar(void);
 
-/* Serial_ReadInt:
+/* serialpp::readInt():
    Reads an integer from the Serial moniter
 
    @params
@@ -129,9 +132,9 @@ char Serial_ReadChar(void);
    int    -9999             if no int could be read
            other            if int successfully read
 */
-int Serial_ReadInt(void);
+static int readInt(void);
 
-/* Serial_ReadDouble:
+/* serialpp::readDouble():
    Reads a double from the Serial moniter (Max 14 digits)
 
    @params
@@ -141,7 +144,8 @@ int Serial_ReadInt(void);
    double   -9999.99          if no double could be read
              other            if double successfully read
 */
-double Serial_ReadDouble(void);
-/*************************************************************************/
+static double readDouble(void);
+};
+// End class serialpp
 
 #endif

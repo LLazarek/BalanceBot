@@ -1,3 +1,8 @@
+/* Class MotorController:
+   A class defining an interface to easily control the two motors of the segway
+   via analog communication with the RobotEQ motor controller.
+*/
+
 #ifndef MOTORCONTROLLER_H
 #define MOTORCONTROLLER_H
 
@@ -18,8 +23,8 @@ public:
   void boot();
   
   /* MotorController::init():
-     Ensures that the RobotEQ motor controller is initialized to Analog Control Mode with
-     a constant 2.5V signal for 1 sec. 
+     Ensures that the RobotEQ motor controller is initialized to Analog Control
+     Mode with a constant 2.5V signal for 1 sec. 
 
      @params
      void
@@ -58,9 +63,9 @@ public:
 private:
   double DAC1_mult, DAC2_mult;
 
-  /* DAC:
-     Controls one Digital to Analog Converter to ouput the given voltage analog signal
-     using SPI to communicate with the DAC.
+  /* DAC():
+     Controls one Digital to Analog Converter to ouput the given voltage analog
+     signal using SPI to communicate with the DAC.
 
      @params
      dac:            The DAC chip to control

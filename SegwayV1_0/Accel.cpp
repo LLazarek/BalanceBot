@@ -5,7 +5,7 @@ void Accel::boot(){
   Wire.begin();
   pinMode(A0, INPUT); // Accel pin = A0
   while(!(this -> init())){
-    Serial.println("Can't load accel");
+    Print("Unable to load accel, please check IMU connection");
     delay(1000);
   }
   this -> enableDefault();

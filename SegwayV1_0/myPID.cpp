@@ -7,6 +7,12 @@ void myPID::init(){
   this -> SetOutputLimits(-255, 255);
 }
 
+double myPID::compute(double inp){
+  input = inp;
+  this -> Compute();
+  return output = updateHist(output); // Apply smoothing
+}
+
 double myPID::updateHist(double output){
   static int h = 0;
   double sum = 0;

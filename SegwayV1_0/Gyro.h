@@ -49,7 +49,7 @@ public:
   
 private:
   double bias;
-  const double DPS_conversion_factor = 8.75/1000; // Conversion factor to angular velocity
+  const double DPS_conversion_factor = 8.75/1000; // Conversion to angular vel
 };
 // End class Gyro
 

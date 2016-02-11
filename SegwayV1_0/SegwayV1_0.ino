@@ -11,6 +11,11 @@ void setup(){
   pinMode(switchPin, INPUT_PULLUP);// Engage pullup resistor
   pinMode(LEDpin, OUTPUT);
 
+  /* boot() functions must be invoked within setup() (as opposed to in the
+     objects' respective constructors) to avoid conflict with the arduino's own
+     initialization process - globals are constructed before the arduino is
+     fully ready to execute some types of commands.
+   */
   imu.boot();
   mc.boot();
   
@@ -44,14 +49,15 @@ void loop(){
       digitalWrite(LEDpin, LOW);
       prevKillState = 1;
       mc.write(0);
-      Println("Emergency software kill has been activated; robot is now off. Flip the switch to OFF to re-enter normal execution.");
+      Println("Emergency software kill has been activated; robot is now off."
+	      " Flip the switch to OFF to re-enter normal execution.");
       PRINT_STATUS;
     }
 
     // Exit emergency kill loop once switch has been flipped to OFF
     if(digitalRead(switchPin)) kill = prevKillState = 0;
     
-    if(checkSerialMon()) handleInput();
+    if(serialpp::inputAvailable()) handleInput();
     
     delay(250);
   }
@@ -67,7 +73,7 @@ void loop(){
       PRINT_STATUS;
     }
     
-    if(checkSerialMon()) handleInput();
+    if(serialpp::inputAvailable()) handleInput();
     
     delay(250);
   }
@@ -78,20 +84,25 @@ void loop(){
   }
 
   
-  if(checkSerialMon()) handleInput();
+  if(serialpp::inputAvailable()) handleInput();
     
-  pid.setInput(imu.readFilteredAngle());// Filter angle reading
+  /*  pid.setInput(imu.readFilteredAngle());// Filter angle reading
   Print(pid.getInput());
   pid.Compute();
   pid.setOutput(pid.updateHist(pid.getOutput()));// Smooth PID output
-  Print1("\t", pid.getOutput(), "");
-  
-  if(pid.getInput() < -17 || pid.getInput() > 30){// Robot has fallen over
+  Print1("\t", pid.getOutput(), "");*/
+
+  double angle = imu.readFilteredAngle();
+  Print(angle);
+  if(angle < -17 || angle > 30){ // Robot has fallen over
     fallen = 1;
-    mc.write(0);// Cut the motors
+    mc.write(0); // Cut the motors
   }
   
-  if(!fallen) mc.write(pid.getOutput());
+  if(!fallen){
+    mc.write(pid.compute(angle));
+    Print1("\t", pid.getOutput(), "");
+  }
   else Print("\tFallen");
 
   Print1("\tPot: ", analogRead(A0), "");

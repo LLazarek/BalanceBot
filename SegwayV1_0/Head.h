@@ -9,7 +9,10 @@
 #define LEDpin 2
 #define switchPin 7
 
-#define PRINT_STATUS  Print5("K vals: kp = ", pid.getKp(), ", ki = ", pid.getKi(), ", kd = ", pid.getKd(), "\nleft = ", mc.getLeftSpeed(), ", right = ", mc.getRightSpeed(), "\n")
+#define PRINT_STATUS  Print5("K vals: kp = ", pid.getKp(), ", ki = ",\
+			     pid.getKi(),", kd = ", pid.getKd(),\
+			     "\nleft = ", mc.getLeftSpeed(), ", right = ",\
+			     mc.getRightSpeed(), "\n")
 
 int fallen = 0;// Flag for fall detection
 
@@ -43,13 +46,14 @@ void handleInput(){
   char var;
   double res;
   
-  var = Serial_ReadChar();// See std.h
+  var = serialpp::readChar();
   if(var != -1 && var == 's'){
     Print("Emergency software kill/override activated.\n");
     kill = true;
-  }else if(var != -1 && (var == 'p' || var == 'i' || var == 'd' || var == 'l' || var == 'r')){
-    res = Serial_ReadDouble();// See std.h
-    Serial_RmWhiteSpc();// See std.h
+  }else if(var != -1 &&
+	   (var == 'p' || var == 'i' ||var == 'd' ||var == 'l' || var == 'r')){
+    res = serialpp::readDouble();
+    serialpp::rmWhiteSpc();
 
     if(var == 'p'){
       Print2("Changed kp value from ", pid.getKp(), " to ", res, "\n");
