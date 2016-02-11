@@ -41,6 +41,6 @@ void MotorController::init(){
 void MotorController::write(int spd){
   spd = constrain(spd, -250, 250);
   spd += 250;
-  DAC(DAC1, 5.0 - ((double)spd*DAC1_mult)/100);// Polarity of one motor flipped
-  DAC(DAC2, ((double)spd*DAC2_mult)/100);
+  DAC(DAC1, ((double)spd*DAC1_mult)/100);// Polarity of one motor flipped
+  DAC(DAC2, 5.0 - ((double)spd*DAC2_mult)/100);
 }

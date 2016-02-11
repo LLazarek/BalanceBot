@@ -94,7 +94,7 @@ void loop(){
 
   double angle = imu.readFilteredAngle();
   Print(angle);
-  if(angle < -17 || angle > 30){ // Robot has fallen over
+  if(angle < -18 || angle > 18){ // Robot has fallen over
     fallen = 1;
     mc.write(0); // Cut the motors
   }
