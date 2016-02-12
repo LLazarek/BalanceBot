@@ -1,0 +1,743 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+               "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>BalanceBot</title>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+<meta name="title" content="BalanceBot"/>
+<meta name="generator" content="Org-mode"/>
+<meta name="generated" content="2016-02-12T09:34-0500"/>
+<meta name="author" content="Lukas Lazarek"/>
+<meta name="description" content=""/>
+<meta name="keywords" content=""/>
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  html { font-family: Times, serif; font-size: 12pt; }
+  .title  { text-align: center; }
+  .todo   { color: red; }
+  .done   { color: green; }
+  .tag    { background-color: #add8e6; font-weight:normal }
+  .target { }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .right  {margin-left:auto; margin-right:0px;  text-align:right;}
+  .left   {margin-left:0px;  margin-right:auto; text-align:left;}
+  .center {margin-left:auto; margin-right:auto; text-align:center;}
+  p.verse { margin-left: 3% }
+  pre {
+	border: 1pt solid #AEBDCC;
+	background-color: #F3F5F7;
+	padding: 5pt;
+	font-family: courier, monospace;
+        font-size: 90%;
+        overflow:auto;
+  }
+  table { border-collapse: collapse; }
+  td, th { vertical-align: top;  }
+  th.right  { text-align:center;  }
+  th.left   { text-align:center;   }
+  th.center { text-align:center; }
+  td.right  { text-align:right;  }
+  td.left   { text-align:left;   }
+  td.center { text-align:center; }
+  dt { font-weight: bold; }
+  div.figure { padding: 0.5em; }
+  div.figure p { text-align: center; }
+  div.inlinetask {
+    padding:10px;
+    border:2px solid gray;
+    margin:10px;
+    background: #ffffcc;
+  }
+  textarea { overflow-x: auto; }
+  .linenr { font-size:smaller }
+  .code-highlighted {background-color:#ffff00;}
+  .org-info-js_info-navigation { border-style:none; }
+  #org-info-js_console-label { font-size:10px; font-weight:bold;
+                               white-space:nowrap; }
+  .org-info-js_search-highlight {background-color:#ffff00; color:#000000;
+                                 font-weight:bold; }
+  /*]]>*/-->
+</style><style> p { white-space: pre-wrap } </style>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+
+</head>
+<body>
+
+<div id="preamble">
+
+</div>
+
+<div id="content">
+<h1 class="title">BalanceBot</h1>
+
+
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1 PID Tuning:</a></li>
+<li><a href="#sec-2">2 Wiring</a>
+<ul>
+<li><a href="#sec-2-1">2.1 General</a>
+<ul>
+<li><a href="#sec-2-1-1">2.1.1 Software control ON/OFF switch</a></li>
+<li><a href="#sec-2-1-2">2.1.2 Joint Arduino/RobotEQ power supply</a></li>
+<li><a href="#sec-2-1-3">2.1.3 Motor Power 1 (into RobotEQ)</a></li>
+<li><a href="#sec-2-1-4">2.1.4 E-stop</a></li>
+<li><a href="#sec-2-1-5">2.1.5 Motor Power 2 (from RobotEQ)</a></li>
+<li><a href="#sec-2-1-6">2.1.6 Status LED</a></li>
+<li><a href="#sec-2-1-7">2.1.7 Steering potentiometer</a></li>
+<li><a href="#sec-2-1-8">2.1.8 Arduino-RobotEQ Analog Comm</a></li>
+</ul>
+</li>
+<li><a href="#sec-2-2">2.2 Arduino / Breadboard</a>
+<ul>
+<li><a href="#sec-2-2-1">2.2.1 General</a></li>
+<li><a href="#sec-2-2-2">2.2.2 IMU</a></li>
+<li><a href="#sec-2-2-3">2.2.3 DAC Output Probe</a></li>
+<li><a href="#sec-2-2-4">2.2.4 DAC</a></li>
+<li><a href="#sec-2-2-5">2.2.5 Images</a></li>
+</ul></li>
+</ul>
+</li>
+<li><a href="#sec-3">3 DAC SPI Notes</a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> PID Tuning:</h2>
+<div class="outline-text-2" id="text-1">
+
+<p>Start with P, I, D = 0
+Then turn up P until you see oscillation
+Then turn up D until the oscillation disappears; adjust it until it becomes critically damped (no overshoot)
+Then turn up I until it reaches and stabilizes at the set point in a reasonable amount of time
+</p>
+<p>
+The proportional term reacts proportionally to the system's current error. It is the driving force of the PID.
+The derivative term serves to dampen the proportional so that it doesn't oscillate about the set point.
+The integral term serves to increase responsiveness and decrease stabilization time.
+</p>
+<p>
+I typically like to do this by opening an excel spreadsheet and running the balancebot with the serial monitor open. After each run, I copy the data output from the serial monitor into excel and graph what it looks like. I then use those graphs to analyze how each tuning setting is working.
+</p>
+<p>
+The PID values can be adjusted within Head.h, on line 30. Additionally, the tunings can be updated dynamically via the serial monitor <span style="text-decoration:underline;">after having performed its first bias initialization</span>. The logic behind this is that the values that you want to use for the first run should be those in the code.
+</p>
+
+</div>
+
+</div>
+
+<div id="outline-container-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> Wiring</h2>
+<div class="outline-text-2" id="text-2">
+
+
+</div>
+
+<div id="outline-container-2-1" class="outline-3">
+<h3 id="sec-2-1"><span class="section-number-3">2.1</span> General</h3>
+<div class="outline-text-3" id="text-2-1">
+
+
+</div>
+
+<div id="outline-container-2-1-1" class="outline-4">
+<h4 id="sec-2-1-1"><span class="section-number-4">2.1.1</span> Software control ON/OFF switch</h4>
+<div class="outline-text-4" id="text-2-1-1">
+
+<ul>
+<li>Controls arduino program
+</li>
+</ul>
+
+<table border="2" cellspacing="5" cellpadding="6" rules="all" frame="border">
+<colgroup><col class="left" /><col class="left" /><col class="left" />
+</colgroup>
+<thead>
+<tr><th scope="col" class="left">Wire</th><th scope="col" class="left">Connects to</th><th scope="col" class="left">Purpose</th></tr>
+</thead>
+<tbody>
+<tr><td class="left">Red</td><td class="left">Arduino pin 7</td><td class="left">Power/input</td></tr>
+<tr><td class="left">Black</td><td class="left">Breadboard ground rail 1</td><td class="left">GND</td></tr>
+<tr><td class="left">White</td><td class="left">N/A</td><td class="left">N/A</td></tr>
+</tbody>
+</table>
+
+
+</div>
+
+</div>
+
+<div id="outline-container-2-1-2" class="outline-4">
+<h4 id="sec-2-1-2"><span class="section-number-4">2.1.2</span> Joint Arduino/RobotEQ power supply</h4>
+<div class="outline-text-4" id="text-2-1-2">
+
+<p>Power supply shared between Arduino and RobotEQ. The leads from the supply are split into two going to each controller:
+</p><ul>
+<li id="sec-2-1-2-1">RobotEQ Controller Power<br/>
+<ul>
+<li>Powers the RobotEQ controller independently from the motor power supply
+<ul>
+<li>The controller can be powered by the motor power supply and this lead left floating, but a seperate 12-40v supply is recommended to provide the controller with a distinct logic high reference point
+</li>
+</ul>
+
+</li>
+</ul>
+
+<table border="2" cellspacing="5" cellpadding="6" rules="all" frame="border">
+<colgroup><col class="left" /><col class="left" /><col class="left" />
+</colgroup>
+<thead>
+<tr><th scope="col" class="left">Wire</th><th scope="col" class="left">Connects to</th><th scope="col" class="left">Purpose</th></tr>
+</thead>
+<tbody>
+<tr><td class="left">Yellow</td><td class="left">RobotEQ</td><td class="left">Power</td></tr>
+<tr><td class="left">Black</td><td class="left">RobotEQ</td><td class="left">GND</td></tr>
+</tbody>
+</table>
+
+
+</li>
+</ul>
+<ul>
+<li id="sec-2-1-2-2">Arduino Power<br/>
+<ul>
+<li>Arduino runs on a 9-20v DC supply (recommended 9-12v) - higher voltages highly inefficient
+</li>
+<li>Requires a center-positive 9mm barrel jack
+</li>
+</ul>
+
+
+</li>
+</ul>
+</div>
+
+</div>
+
+<div id="outline-container-2-1-3" class="outline-4">
+<h4 id="sec-2-1-3"><span class="section-number-4">2.1.3</span> Motor Power 1 (into RobotEQ)</h4>
+<div class="outline-text-4" id="text-2-1-3">
+
+<ul>
+<li>Two 12v 12ah batteries connected in series through red Anderson Power connectors
+</li>
+<li>Raw power for motors
+</li>
+<li>Runs through E-Stop     and     ON/OFF switch on bottom before going into RobotEQ controller
+</li>
+<li>Needs 24v DC (max, can operate 12-24v)
+</li>
+</ul>
+
+<table border="2" cellspacing="5" cellpadding="6" rules="all" frame="border">
+<colgroup><col class="left" /><col class="left" /><col class="left" />
+</colgroup>
+<thead>
+<tr><th scope="col" class="left">Wire</th><th scope="col" class="left">Connects to</th><th scope="col" class="left">Purpose</th></tr>
+</thead>
+<tbody>
+<tr><td class="left">Brown</td><td class="left">Through red connector then SPLITS into two thick red wires going into RobotEQ</td><td class="left">Power</td></tr>
+<tr><td class="left">Black</td><td class="left">Through red connector, E-stop, on/off (bottom) then SPLITS into two thick black wires going into RobotEQ</td><td class="left">GND</td></tr>
+</tbody>
+</table>
+
+
+</div>
+
+</div>
+
+<div id="outline-container-2-1-4" class="outline-4">
+<h4 id="sec-2-1-4"><span class="section-number-4">2.1.4</span> E-stop</h4>
+<div class="outline-text-4" id="text-2-1-4">
+
+<ul>
+<li>Controls connection of ground wire for motor power (see <a href="#Motor-Power-1">Motor Power 1</a>)
+</li>
+</ul>
+
+<table border="2" cellspacing="5" cellpadding="6" rules="all" frame="border">
+<colgroup><col class="left" /><col class="left" /><col class="left" />
+</colgroup>
+<thead>
+<tr><th scope="col" class="left">Wire</th><th scope="col" class="left">Connects to</th><th scope="col" class="left">Purpose</th></tr>
+</thead>
+<tbody>
+<tr><td class="left">Blue (x2)</td><td class="left">The red base of the E-stop</td><td class="left">Cuts motor power</td></tr>
+</tbody>
+</table>
+
+
+</div>
+
+</div>
+
+<div id="outline-container-2-1-5" class="outline-4">
+<h4 id="sec-2-1-5"><span class="section-number-4">2.1.5</span> Motor Power 2 (from RobotEQ)</h4>
+<div class="outline-text-4" id="text-2-1-5">
+
+<ul>
+<li>Regulated power for motors (controlled by RobotEQ, drawn from <a href="#Motor-Power-1">Motor Power 1</a>)
+</li>
+<li>4 wires total, 2 per motor
+</li>
+</ul>
+
+<table border="2" cellspacing="5" cellpadding="6" rules="all" frame="border">
+<colgroup><col class="left" /><col class="left" /><col class="left" />
+</colgroup>
+<thead>
+<tr><th scope="col" class="left">Wire</th><th scope="col" class="left">Connects to</th><th scope="col" class="left">Purpose</th></tr>
+</thead>
+<tbody>
+<tr><td class="left">White</td><td class="left">Motor's red lead</td><td class="left">Motor power</td></tr>
+<tr><td class="left">Green</td><td class="left">Motor's black lead</td><td class="left">Motor GND</td></tr>
+</tbody>
+</table>
+
+
+</div>
+
+</div>
+
+<div id="outline-container-2-1-6" class="outline-4">
+<h4 id="sec-2-1-6"><span class="section-number-4">2.1.6</span> Status LED</h4>
+<div class="outline-text-4" id="text-2-1-6">
+
+<ul>
+<li>Shows status of segway
+</li>
+<li>Lit when segway is ready to go on the software end (not off or calibrating)
+<ul>
+<li>DOES NOT indicate motor readiness status
+</li>
+</ul>
+
+</li>
+</ul>
+
+<table border="2" cellspacing="5" cellpadding="6" rules="all" frame="border">
+<colgroup><col class="left" /><col class="left" /><col class="left" />
+</colgroup>
+<thead>
+<tr><th scope="col" class="left">Wire</th><th scope="col" class="left">Connects to</th><th scope="col" class="left">Purpose</th></tr>
+</thead>
+<tbody>
+<tr><td class="left">White</td><td class="left">Arduino pin 2</td><td class="left">Power/control</td></tr>
+<tr><td class="left">Blue</td><td class="left">Breadboard ground rail 2</td><td class="left">GND</td></tr>
+</tbody>
+</table>
+
+
+</div>
+
+</div>
+
+<div id="outline-container-2-1-7" class="outline-4">
+<h4 id="sec-2-1-7"><span class="section-number-4">2.1.7</span> Steering potentiometer</h4>
+<div class="outline-text-4" id="text-2-1-7">
+
+<ul>
+<li>10k Poteniometer mounted and attached to the bold securing the handle bar to the frame
+</li>
+<li>Bolt rotates with handle bar, rotating pot
+</li>
+</ul>
+
+<table border="2" cellspacing="5" cellpadding="6" rules="all" frame="border">
+<colgroup><col class="left" /><col class="left" /><col class="left" />
+</colgroup>
+<thead>
+<tr><th scope="col" class="left">Wire</th><th scope="col" class="left">Connects to</th><th scope="col" class="left">Purpose</th></tr>
+</thead>
+<tbody>
+<tr><td class="left">Red</td><td class="left">BB power rail 2</td><td class="left">Power</td></tr>
+<tr><td class="left">Black</td><td class="left">BB GND rail 2</td><td class="left">GND</td></tr>
+<tr><td class="left">Green</td><td class="left">ARD pin A0</td><td class="left">Wiper/variable voltage signal</td></tr>
+</tbody>
+</table>
+
+
+</div>
+
+</div>
+
+<div id="outline-container-2-1-8" class="outline-4">
+<h4 id="sec-2-1-8"><span class="section-number-4">2.1.8</span> Arduino-RobotEQ Analog Comm</h4>
+<div class="outline-text-4" id="text-2-1-8">
+
+<ul>
+<li>Communication channel between Arduino and RobotEQ
+</li>
+<li>Arduino sends 2x analog voltage dictating motor speed &amp; direction
+</li>
+<li>Wires from breadboard connected to serial connector on RobotEQ
+<ul>
+<li>Serial wire cut open and only 4 wires used:
+</li>
+</ul>
+
+</li>
+</ul>
+
+<table border="2" cellspacing="5" cellpadding="6" rules="all" frame="border">
+<colgroup><col class="left" /><col class="left" /><col class="left" />
+</colgroup>
+<thead>
+<tr><th scope="col" class="left">Breadboard location</th><th scope="col" class="left">Connects to (serial cable to RobotEQ)</th><th scope="col" class="left">Purpose</th></tr>
+</thead>
+<tbody>
+<tr><td class="left">Row 30 col F</td><td class="left">White</td><td class="left">Analog 1</td></tr>
+<tr><td class="left">Row 30 col F</td><td class="left">Pink</td><td class="left">Analog 2</td></tr>
+<tr><td class="left">Row 30 col F</td><td class="left">Brown w/ white stripe</td><td class="left">+5v (from Arduino)</td></tr>
+<tr><td class="left">Row 30 col F</td><td class="left">Black w/ white stripe</td><td class="left">GND</td></tr>
+</tbody>
+</table>
+
+
+
+
+<br></br>
+
+</div>
+</div>
+
+</div>
+
+<div id="outline-container-2-2" class="outline-3">
+<h3 id="sec-2-2"><span class="section-number-3">2.2</span> Arduino / Breadboard</h3>
+<div class="outline-text-3" id="text-2-2">
+
+<p>Power/GND rail pairs run lengthwise on each side of the board:
+Rail 1 is next to col J
+Rail 2 is next to col A
+</p>
+<p>
+"BB" indicates breadboard location
+"ARD" indicates arduino location/pin
+</p>
+<p>
+If connecting wire color is omitted it is assumed to be yellow.
+</p>
+
+</div>
+
+<div id="outline-container-2-2-1" class="outline-4">
+<h4 id="sec-2-2-1"><span class="section-number-4">2.2.1</span> General</h4>
+<div class="outline-text-4" id="text-2-2-1">
+
+<table border="2" cellspacing="5" cellpadding="6" rules="all" frame="border">
+<colgroup><col class="left" /><col class="left" /><col class="left" />
+</colgroup>
+<thead>
+<tr><th scope="col" class="left">Lead</th><th scope="col" class="left">Connects to&hellip;</th><th scope="col" class="left">Lead</th></tr>
+</thead>
+<tbody>
+<tr><td class="left">BB GND rail 1</td><td class="left"></td><td class="left">BB GND rail 2</td></tr>
+<tr><td class="left">BB GND rail 2</td><td class="left">black wire</td><td class="left">ARD GND</td></tr>
+</tbody>
+</table>
+
+
+
+</div>
+
+</div>
+
+<div id="outline-container-2-2-2" class="outline-4">
+<h4 id="sec-2-2-2"><span class="section-number-4">2.2.2</span> IMU</h4>
+<div class="outline-text-4" id="text-2-2-2">
+
+<p>Plugged in with Polulu logo facing center of BB in col E, rows 1-5
+</p><table border="2" cellspacing="5" cellpadding="6" rules="all" frame="border">
+<colgroup><col class="left" /><col class="left" /><col class="left" />
+</colgroup>
+<thead>
+<tr><th scope="col" class="left">Lead</th><th scope="col" class="left">Connects to&hellip;</th><th scope="col" class="left">Lead</th></tr>
+</thead>
+<tbody>
+<tr><td class="left">IMU SCL (BB row 1)</td><td class="left">blue wire</td><td class="left">ARD A5</td></tr>
+<tr><td class="left">IMU SDA (BB row 2)</td><td class="left">green wire</td><td class="left">ARD A4</td></tr>
+<tr><td class="left">IMU GND (BB row 3)</td><td class="left">black wire</td><td class="left">ARD GND</td></tr>
+<tr><td class="left">IMU VIN</td><td class="left">red wire</td><td class="left">ARD +3.3v</td></tr>
+</tbody>
+</table>
+
+
+</div>
+
+</div>
+
+<div id="outline-container-2-2-3" class="outline-4">
+<h4 id="sec-2-2-3"><span class="section-number-4">2.2.3</span> DAC Output Probe</h4>
+<div class="outline-text-4" id="text-2-2-3">
+
+<table border="2" cellspacing="5" cellpadding="6" rules="all" frame="border">
+<colgroup><col class="left" /><col class="left" /><col class="left" />
+</colgroup>
+<thead>
+<tr><th scope="col" class="left">Lead</th><th scope="col" class="left">Connects to&hellip;</th><th scope="col" class="left">Lead</th></tr>
+</thead>
+<tbody>
+<tr><td class="left">DAC1 output (BB row 30)</td><td class="left"></td><td class="left">Multimeter +</td></tr>
+<tr><td class="left">DAC2 output (BB row 29)</td><td class="left"></td><td class="left">Multimeter +</td></tr>
+<tr><td class="left">BB GND rail 1</td><td class="left"></td><td class="left">Multimeter -</td></tr>
+</tbody>
+</table>
+
+
+</div>
+
+</div>
+
+<div id="outline-container-2-2-4" class="outline-4">
+<h4 id="sec-2-2-4"><span class="section-number-4">2.2.4</span> DAC</h4>
+<div class="outline-text-4" id="text-2-2-4">
+
+<p>DAC chips arranged as follows over the BB center divider, divets facing row 1, with pin numbering: ('u' indicates the divet location)
+</p>
+
+
+<pre class="example">1 -|==u==|- 8
+2 -|     |- 7
+3 -|     |- 6
+4 -|=====|- 5
+</pre>
+
+
+<p>
+Chip 1 (DAC1):
+Pins 1, 8 on row 13
+</p>
+<p>
+Chip 2 (DAC2):
+Pins 1, 8 on row 18
+</p>
+<p>
+Columns A-E constitute the "left" side of the breadboard,
+columns F-J constitute the "right" side of the breadboard
+</p>
+
+<table border="2" cellspacing="5" cellpadding="6" rules="all" frame="border">
+<colgroup><col class="left" /><col class="left" /><col class="left" />
+</colgroup>
+<thead>
+<tr><th scope="col" class="left">Lead</th><th scope="col" class="left">Connects to&hellip;</th><th scope="col" class="left">Lead</th></tr>
+</thead>
+<tbody>
+<tr><td class="left">RobotEQ comm cable white (BB row 30)</td><td class="left"></td><td class="left">DAC1 pin 8 (BB row 13)</td></tr>
+<tr><td class="left">RobotEQ comm cable pink (BB row 29)</td><td class="left"></td><td class="left">DAC2 pin 8 (BB row 18)</td></tr>
+<tr><td class="left">RobotEQ comm cable brown w/ stripe (BB row 28)</td><td class="left"></td><td class="left">BB power rail 2</td></tr>
+<tr><td class="left">RobotEQ comm cable black w/ stripe (BB row 27)</td><td class="left"></td><td class="left">BB GND rail 2</td></tr>
+</tbody>
+</table>
+
+
+
+<table border="2" cellspacing="5" cellpadding="6" rules="all" frame="border">
+<colgroup><col class="left" /><col class="left" /><col class="left" />
+</colgroup>
+<thead>
+<tr><th scope="col" class="left">Lead</th><th scope="col" class="left">Connects to&hellip;</th><th scope="col" class="left">Lead</th></tr>
+</thead>
+<tbody>
+<tr><td class="left">DAC1 pin 1 (BB row 13 left)</td><td class="left"></td><td class="left">DAC1 pin 6 (BB row 15 right)</td></tr>
+<tr><td class="left"></td><td class="left">red wire</td><td class="left">ARD +5v</td></tr>
+<tr><td class="left"></td><td class="left"></td><td class="left">BB power rail 2</td></tr>
+<tr><td class="left">DAC1 pin 2 (BB row 14 left)</td><td class="left">blue stripe wire</td><td class="left">ARD pin 10</td></tr>
+<tr><td class="left">DAC1 pin 3 (BB row 15 left)</td><td class="left"></td><td class="left">DAC2 pin 3 (BB row 20 left)</td></tr>
+<tr><td class="left"></td><td class="left">green stripe wire</td><td class="left">ARD pin 13</td></tr>
+<tr><td class="left">DAC1 pin 4 (BB row 16 left)</td><td class="left"></td><td class="left">DAC2 pin 4 (BB row 21 left)</td></tr>
+<tr><td class="left"></td><td class="left">orange wire</td><td class="left">ARD pin 11</td></tr>
+<tr><td class="left">DAC1 pin 5 (BB row 16 right)</td><td class="left"></td><td class="left">DAC1 pin 7 (BB row 14 right)</td></tr>
+<tr><td class="left">DAC1 pin 7 (BB row 14 right)</td><td class="left"></td><td class="left">BB GND rail 1</td></tr>
+<tr><td class="left">DAC2 pin 1 (BB row 18 left)</td><td class="left"></td><td class="left">BB power rail 2</td></tr>
+<tr><td class="left"></td><td class="left"></td><td class="left">DAC2 pin 6 (BB row 20 right)</td></tr>
+<tr><td class="left">DAC2 pin 2 (BB row 19 left)</td><td class="left">orange stripe wire</td><td class="left">ARD pin 8</td></tr>
+<tr><td class="left">DAC2 pin 5 (BB row 21 right)</td><td class="left"></td><td class="left">DAC2 pin 7 (BB row 19 right)</td></tr>
+<tr><td class="left">DAC2 pin 7 (BB row 19 right)</td><td class="left"></td><td class="left">BB GND rail 1</td></tr>
+</tbody>
+</table>
+
+
+</div>
+
+</div>
+
+<div id="outline-container-2-2-5" class="outline-4">
+<h4 id="sec-2-2-5"><span class="section-number-4">2.2.5</span> Images</h4>
+<div class="outline-text-4" id="text-2-2-5">
+
+<p>The final state of the breadboard is as shown:
+<img src="./images/segway_BB_final.jpg" width="50%" alt="./images/segway_BB_final.jpg" />
+</p>
+<p>
+The slightly older images below provide better views of the breadboard layout due to better lighting. Additionally, the configuration is only slightly modified in the final image above, and the additions that have been made are easily visible there.
+<img src="./images/segway_BB_1.jpg" width="50%" alt="./images/segway_BB_1.jpg" />
+<img src="./images/segway_BB_2.jpg" width="50%" alt="./images/segway_BB_2.jpg" />
+<img src="./images/segway_BB_3.jpg" width="50%" alt="./images/segway_BB_3.jpg" />
+<img src="./images/segway_BB_4.jpg" width="50%" alt="./images/segway_BB_4.jpg" />
+<img src="./images/segway_BB_5.jpg" width="50%" alt="./images/segway_BB_5.jpg" />
+</p>
+</div>
+</div>
+</div>
+
+</div>
+
+<div id="outline-container-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> DAC SPI Notes</h2>
+<div class="outline-text-2" id="text-3">
+
+<ul>
+<li>Supports Mode 0,0 &amp; Mode 1,1
+  Clock polar:  0          1
+  Clock phase:    0          1
+</li>
+<li>Rated @ 20 MHz
+</li>
+<li>Samples on rising edge
+</li>
+<li>Data sent when CS pin held low
+</li>
+<li>16 bits
+</li>
+<li>Most Sig. 4 bits are config bits
+</li>
+<li>bring LDAC pin to low to write the commands and update VOUT
+</li>
+</ul>
+
+
+<p>
+:::::::::::::from datasheet:For the MCP4921, 8-PDIP::::::::::::::
+Pin  Name   Function
+1    Vdd    Power supply (max 6.5v)
+2    CS     chip select, held low for the duration of a write command
+3    SCK    clock signal from arduino when data is being sent
+4    SDI    data sent
+5    LDAC   Latch DAC syncronization input. Can be tied low if transfer on
+            the rising edge of CS is desired. Otherwise output happens on 
+            rising edge of the CS pin (16 bit send complete)
+6    Vrefa  The input signal can range from AVss to Vdd
+7    AVss   Power ground
+8    Vouta  Analog voltage output signal (DAC)
+</p>
+<p>
+bit 15 A/B: DACA or DACB Select bit
+  1 = Write to DACB
+  0 = Write to DACA    &ndash;Use this one since there is no DACB signal
+</p>
+<p>  
+bit 14 BUF: VREF Input Buffer Control bit
+  1 = Buffered
+  0 = Unbuffered       &ndash;Use this one to output DAC without extra delay time
+</p>
+<p>  
+bit 13 GA: Output Gain Select bit
+  1 = 1x (VOUT = VREF * D/4096         &ndash;Use this one for one to one output
+  0 = 2x (VOUT = 2 * VREF * D/4096)    &ndash;This will put a gain of 2 on the output programmed
+                                       &ndash;but the max will still be the reference voltage
+bit 12 SHDN: Output Power Down Control bit
+  1 = Output Power Down Control bit    &ndash; Use this one to turn on the output DAC voltage
+  0 = Output buffer disabled, Output is high impedance   &ndash;this one will turn it off
+</p>
+<p>  
+bit 11-0 D11:D0: DAC Data bits
+  12 bit number “D” which sets the output value. Contains a value between 0 and 4095
+</p>
+<p>
+::::::::::from Arduino Refernce page for SPI:::::::::::::::::::::::::::::::::
+Every SPI device has a maximum allowed speed for SPI Bus. The SPI.setClockDivider()
+allows you to change the clock speed to make your device working properly (default is 4MHz).
+These pins support SPI communication using the SPI library (DUO):
+SPI: 10 (SS), 11 (MOSI), 12 (MISO), 13 (SCK). 
+</p>
+<p>
+::::::::::How to hook up the MCP4921 to the Arduino UNO:::::::::::::::::::::::::::::::::::::
+MCP4921, 8-PDIP
+Pin  Name  &mdash;&gt; Connection
+1    Vdd   &mdash;&gt; 5 volt power supply - can come from Arduino
+2    CS    &mdash;&gt; Arduino pin 10
+3    SCK   &mdash;&gt; Arduino pin 13
+4    SDI   &mdash;&gt; Arduino pin 11
+5    LDAC  &mdash;&gt; Ground
+6    Vrefa &mdash;&gt; 5 volt power supply - for reference use only
+7    AVss  &mdash;&gt; Ground
+8    Vouta &mdash;&gt; Analog voltage output signal (DAC)
+</p>
+
+<ul>
+<li>See <span style="text-decoration:underline;">Page 24</span>
+</li>
+<li>See: <a href="https://www.arduino.cc/en/reference/SPI">https://www.arduino.cc/en/reference/SPI</a>
+</li>
+</ul>
+
+
+
+<p>
+*******************- DAC IS WORKING **************************
+See: <a href="file:///media/lukas/Storage/Work/Segway_Interfacing/LukasADC2DAC/LukasADC2DAC.ino">ADC2DAC.ino</a>
+</p></div>
+</div>
+</div>
+
+<div id="postamble">
+<br><br><br><p class="author">Author: Lukas Lazarek (<a href="mailto:LukasALazarek@gmail.com">LukasALazarek@gmail.com</a>)</p>
+<p class="date">Date: 2016-02-12T09:34-0500</p>
+
+</div>
+</body>
+</html>

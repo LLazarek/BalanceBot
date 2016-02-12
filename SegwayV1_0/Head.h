@@ -17,7 +17,7 @@
 int fallen = 0;// Flag for fall detection
 
 IMU imu(loop_time);
-myPID pid(10, 0, 1); // p, i, d
+myPID pid(2, 0, 0); // p, i, d
 MotorController mc;
 
 bool kill = 0;
