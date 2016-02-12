@@ -33,8 +33,6 @@ void setup(){
   pid.init();
   
   digitalWrite(LEDpin, HIGH);// Ready to go
-  
-  Println("FiltAngle\tPIDOut\tFallen");// Labels for data analysis
 }
 
 
@@ -105,7 +103,7 @@ void loop(){
   }
   else Print("\tFallen");
 
-  Print1("\tPot: ", analogRead(A0), "");
+  Print1("\t", analogRead(A0), "");
   
   Println();
   delay(loop_time);

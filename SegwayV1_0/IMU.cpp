@@ -7,6 +7,7 @@ void IMU::init(){
   gyro.calcBias(bias_sample_size);
   accel.calcBias(bias_sample_size);
   Println("Initialization complete.");
+  Println("angle\tPIDout\tpot");// Labels for data analysis
 }
 
 double IMU::readFilteredAngle(){
